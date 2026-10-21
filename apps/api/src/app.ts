@@ -5,14 +5,15 @@ import { pinoHttp } from "pino-http";
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { widgetCors } from "./middleware/widget-cors.js";
-import {
-  loginRateLimit,
-  messageSubmissionRateLimit,
-  passwordResetRateLimit,
-  emailVerificationRateLimit,
-  registrationRateLimit,
-  widgetInitializationRateLimit
-} from "./security/rate-limits.js";
+// Rate limiters temporarily disabled
+// import {
+//   loginRateLimit,
+//   messageSubmissionRateLimit,
+//   passwordResetRateLimit,
+//   emailVerificationRateLimit,
+//   registrationRateLimit,
+//   widgetInitializationRateLimit
+// } from "./security/rate-limits.js";
 import { logger } from "./lib/logger.js";
 import { healthRouter } from "./routes/health.js";
 import { authRouter } from "./routes/auth.js";
@@ -51,15 +52,16 @@ app.use(
     maxAge: 600
   })
 );
-app.use("/auth/register", registrationRateLimit);
-app.use("/auth/verify-email", emailVerificationRateLimit);
-app.use("/auth/resend-verification", emailVerificationRateLimit);
-app.use("/auth/login", loginRateLimit);
-app.use("/auth/password-reset", passwordResetRateLimit);
-app.use("/widget/init", widgetInitializationRateLimit);
-app.use("/widget/conversation", widgetInitializationRateLimit);
-app.use("/widget/profile", messageSubmissionRateLimit);
-app.use("/widget/:conversationId/messages", messageSubmissionRateLimit);
+// Rate limiters temporarily disabled for initial deployment
+// app.use("/auth/register", registrationRateLimit);
+// app.use("/auth/verify-email", emailVerificationRateLimit);
+// app.use("/auth/resend-verification", emailVerificationRateLimit);
+// app.use("/auth/login", loginRateLimit);
+// app.use("/auth/password-reset", passwordResetRateLimit);
+// app.use("/widget/init", widgetInitializationRateLimit);
+// app.use("/widget/conversation", widgetInitializationRateLimit);
+// app.use("/widget/profile", messageSubmissionRateLimit);
+// app.use("/widget/:conversationId/messages", messageSubmissionRateLimit);
 app.use("/widget", widgetCors);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
