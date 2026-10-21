@@ -4,11 +4,12 @@ import { env } from "./config/env.js";
 import { connectToDatabase, disconnectFromDatabase } from "./db/mongoose.js";
 import { logger } from "./lib/logger.js";
 import { closeRealtimeInfrastructure, createRealtimeServer } from "./socket/realtime.js";
-import { connectRateLimitRedis, disconnectRateLimitRedis } from "./security/rate-limits.js";
+// Rate limiters temporarily disabled
+// import { connectRateLimitRedis, disconnectRateLimitRedis } from "./security/rate-limits.js";
 
 async function start(): Promise<void> {
   await connectToDatabase();
-  await connectRateLimitRedis();
+  // await connectRateLimitRedis(); // Temporarily disabled
   const server = createServer(app);
   const io = await createRealtimeServer(server);
 
@@ -24,7 +25,7 @@ async function start(): Promise<void> {
         process.exitCode = 1;
       }
       await closeRealtimeInfrastructure();
-      await disconnectRateLimitRedis();
+      // await disconnectRateLimitRedis(); // Temporarily disabled
       await disconnectFromDatabase();
     });
   };
