@@ -49,8 +49,8 @@ app.use("/widget", widgetCors);
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin === env.WEB_ORIGIN) {
-        callback(null, origin === env.WEB_ORIGIN);
+      if (origin === env.WEB_ORIGIN) {
+        callback(null, true);
         return;
       }
       callback(null, false);
