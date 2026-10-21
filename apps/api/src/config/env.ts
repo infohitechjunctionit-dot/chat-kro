@@ -8,7 +8,10 @@ dotenv.config({ path: resolve(projectRoot, ".env") });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  API_HOST: z.string().default(process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1"),
+  API_HOST: z.preprocess(
+    (value) => value === undefined || value === "" ? "0.0.0.0" : value,
+    z.string()
+  ),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   MONGODB_URI: z.string().min(1).default("mongodb://127.0.0.1:27017/live-chat-saas"),
   REDIS_URL: z.preprocess(
