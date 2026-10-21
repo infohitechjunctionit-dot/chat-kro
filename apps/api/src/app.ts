@@ -36,16 +36,6 @@ app.use((_request, response, next) => {
   }
   next();
 });
-app.use("/auth/register", registrationRateLimit);
-app.use("/auth/verify-email", emailVerificationRateLimit);
-app.use("/auth/resend-verification", emailVerificationRateLimit);
-app.use("/auth/login", loginRateLimit);
-app.use("/auth/password-reset", passwordResetRateLimit);
-app.use("/widget/init", widgetInitializationRateLimit);
-app.use("/widget/conversation", widgetInitializationRateLimit);
-app.use("/widget/profile", messageSubmissionRateLimit);
-app.use("/widget/:conversationId/messages", messageSubmissionRateLimit);
-app.use("/widget", widgetCors);
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -61,6 +51,16 @@ app.use(
     maxAge: 600
   })
 );
+app.use("/auth/register", registrationRateLimit);
+app.use("/auth/verify-email", emailVerificationRateLimit);
+app.use("/auth/resend-verification", emailVerificationRateLimit);
+app.use("/auth/login", loginRateLimit);
+app.use("/auth/password-reset", passwordResetRateLimit);
+app.use("/widget/init", widgetInitializationRateLimit);
+app.use("/widget/conversation", widgetInitializationRateLimit);
+app.use("/widget/profile", messageSubmissionRateLimit);
+app.use("/widget/:conversationId/messages", messageSubmissionRateLimit);
+app.use("/widget", widgetCors);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(pinoHttp({ logger }));
