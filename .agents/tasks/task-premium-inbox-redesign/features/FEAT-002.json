@@ -1,0 +1,49 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Redesign conversation list items with premium Jivo-style cards including: 48px circular gradient avatars with hash-based colors, 8px green online indicator dot (bottom-right with white border), visitor name + timestamp on same line, website URL line showing domain, 2-line message preview with line-clamp-2, proper spacing and hover states, active state with blue left border.",
+  "status": "completed",
+  "steps": [
+    "1. Add utility functions at top of inbox-page.tsx after imports: getAvatarColor(name: string) that hashes the name and returns a Tailwind gradient class from palette ['from-indigo-500 to-indigo-600', 'from-purple-500 to-purple-600', 'from-blue-500 to-blue-600', 'from-green-500 to-green-600', 'from-orange-500 to-orange-600', 'from-rose-500 to-rose-600', 'from-cyan-500 to-cyan-600', 'from-pink-500 to-pink-600']",
+    "2. Add getWebsiteDisplay(conversation: InboxConversation) utility that returns 'from ' + (conversation.website?.name || extractDomain(conversation.visitor?.currentPageUrl) || 'website')",
+    "3. Add extractDomain(url: string | null) utility that safely extracts hostname from URL using try/catch with new URL()",
+    "4. Locate the conversation list mapping around line 593: conversations.map((conversation) => <button...)",
+    "5. Restructure each conversation card button to use relative positioning for the online indicator",
+    "6. Add 48px (size-12) circular avatar with gradient background using getAvatarColor, white text, size-12 rounded-full, with relative positioning",
+    "7. Add absolute positioned online indicator: size-2 rounded-full bg-green-500 with ring-2 ring-white, positioned bottom-0 right-0 within the avatar container (use relative parent, absolute child pattern)",
+    "8. Layout the text content beside the avatar using flex gap-3: avatar on left (flex-none), content on right (flex-1 min-w-0 for text truncation)",
+    "9. First line: flex items-center justify-between with visitor name (font-semibold text-[15px] text-gray-900 truncate) and timestamp (text-[12px] text-gray-500 flex-none)",
+    "10. Second line: website URL (text-[12px] text-gray-600 truncate) using getWebsiteDisplay()",
+    "11. Third section: message preview (text-[13px] text-gray-700 line-clamp-2 leading-snug) with mt-1",
+    "12. Update padding to p-3, add transition-all duration-150, hover:bg-gray-50",
+    "13. Active state: when selected, add bg-blue-50 border-l-4 border-blue-600 (already exists, keep it)",
+    "14. Keep unread badge in top-right of first line, update to: size-5 min-w-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center"
+  ],
+  "acceptance_criteria": [
+    "Each conversation card shows a 48px circular avatar with gradient background color based on visitor name hash",
+    "Avatar displays first letter of visitor name in white, centered",
+    "Green online indicator dot (8px) appears at bottom-right of avatar with white border ring",
+    "Visitor name and timestamp appear on same line with proper alignment (name left, time right)",
+    "Website domain or name appears below visitor name in muted color",
+    "Message preview shows up to 2 lines with ellipsis using line-clamp-2",
+    "Typography follows spec: name 15px semibold gray-900, time 12px gray-500, website 12px gray-600, message 13px gray-700",
+    "Hover state shows light gray background with smooth 150ms transition",
+    "Active/selected state shows blue background and left border",
+    "Different visitors get different gradient colors consistently (same name = same color)"
+  ],
+  "verification": [
+    "Run 'npm run typecheck' to verify TypeScript types",
+    "Start dev server with 'npm run dev'",
+    "Navigate to inbox page and verify each conversation card displays:",
+    "  - Circular gradient avatar with first letter",
+    "  - Green dot on avatar bottom-right",
+    "  - Name and time on same line",
+    "  - Website URL below name",
+    "  - 2-line message preview with ellipsis",
+    "Verify hover states work smoothly",
+    "Verify same visitor names produce same avatar colors across refreshes",
+    "Test with conversations having different name lengths and missing data"
+  ],
+  "blocked_reason": null,
+  "findings": "Successfully implemented premium Jivo-style conversation cards with: 48px circular gradient avatars using hash-based color assignment from 8 distinct gradients, green online indicator (8px) positioned at bottom-right of avatar with white border ring, visitor name and timestamp on same line with proper alignment, website domain/name displayed below visitor name, 2-line message preview with line-clamp-2, updated typography following specifications (name 15px semibold gray-900, time 12px gray-500, website 12px gray-600, message 13px gray-700), smooth hover state with gray-50 background, active state with blue-50 background and blue-600 left border, unread badge integrated in top-right of first line. All TypeScript types passed validation."
+}

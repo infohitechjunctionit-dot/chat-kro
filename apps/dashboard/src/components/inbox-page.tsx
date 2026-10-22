@@ -88,6 +88,38 @@ function safePath(value: string): string {
   }
 }
 
+function getAvatarColor(name: string): string {
+  const colors = [
+    'from-indigo-500 to-indigo-600',
+    'from-purple-500 to-purple-600',
+    'from-blue-500 to-blue-600',
+    'from-green-500 to-green-600',
+    'from-orange-500 to-orange-600',
+    'from-rose-500 to-rose-600',
+    'from-cyan-500 to-cyan-600',
+    'from-pink-500 to-pink-600'
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = ((hash << 5) - hash) + name.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function extractDomain(url: string | null | undefined): string {
+  if (!url) return '';
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
+function getWebsiteDisplay(conversation: InboxConversation): string {
+  return 'from ' + (conversation.website?.name || extractDomain(conversation.visitor?.currentPageUrl) || 'website');
+}
+
 export function InboxPage() {
   const [workspaceId, setWorkspaceId] = useState("");
   const [currentUserId, setCurrentUserId] = useState("");
@@ -592,11 +624,37 @@ export function InboxPage() {
         <div className="min-h-0 flex-1 overflow-y-auto">
           {loading ? <p role="status" className="p-4 text-sm text-slate-500">Loading conversations…</p>
             : conversations.length === 0 ? <p className="p-4 text-sm text-slate-500">No conversations match this view.</p>
-            : conversations.map((conversation) => <button key={conversation.id} type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); setShowDetails(false); }} aria-current={selectedId === conversation.id ? "true" : undefined} className={`w-full border-b border-slate-100 p-3 text-left transition-all duration-150 hover:scale-[1.02] ${selectedId === conversation.id ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-600" : "hover:bg-slate-50"}`}>
-              <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-medium">{visitorLabel(conversation.visitor)}</span>{conversation.agentUnreadCount > 0 ? <span className="min-w-5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 shadow-sm px-1.5 py-0.5 text-center text-[10px] text-white">{conversation.agentUnreadCount}</span> : null}</span>
-              <span className="mt-1 block truncate text-xs text-slate-500">{conversation.lastMessagePreview || "No messages yet"}</span>
-              <span className="mt-2 flex items-center justify-between gap-2 text-[10px] text-slate-400"><span className="truncate capitalize">{conversation.status} · {conversation.assignedAgentId ? "Assigned" : "Unassigned"}</span><time>{formatTime(conversation.lastMessageAt)}</time></span>
-            </button>)}
+            : conversations.map((conversation) => {
+              const visitorName = visitorLabel(conversation.visitor);
+              const avatarColor = getAvatarColor(visitorName);
+              const avatarInitial = visitorName.charAt(0).toUpperCase();
+              
+              return <button key={conversation.id} type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); setShowDetails(false); }} aria-current={selectedId === conversation.id ? "true" : undefined} className={`relative w-full border-b border-slate-100 p-3 text-left transition-all duration-150 hover:bg-gray-50 ${selectedId === conversation.id ? "bg-blue-50 border-l-4 border-blue-600" : ""}`}>
+                <div className="flex gap-3">
+                  <div className="relative flex-none">
+                    <div className={`size-12 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-semibold text-lg`}>
+                      {avatarInitial}
+                    </div>
+                    <span className="absolute bottom-0 right-0 size-2 rounded-full bg-green-500 ring-2 ring-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-[15px] text-gray-900 truncate">{visitorName}</span>
+                      <div className="flex items-center gap-2 flex-none">
+                        <time className="text-[12px] text-gray-500">{formatTime(conversation.lastMessageAt)}</time>
+                        {conversation.agentUnreadCount > 0 ? <span className="size-5 min-w-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center">{conversation.agentUnreadCount}</span> : null}
+                      </div>
+                    </div>
+                    <div className="text-[12px] text-gray-600 truncate mt-0.5">
+                      {getWebsiteDisplay(conversation)}
+                    </div>
+                    <div className="text-[13px] text-gray-700 line-clamp-2 leading-snug mt-1">
+                      {conversation.lastMessagePreview || "No messages yet"}
+                    </div>
+                  </div>
+                </div>
+              </button>;
+            })}
           {hasMore ? <button type="button" onClick={() => void loadConversations(true)} disabled={loadingMore} className="w-full p-3 text-xs font-medium text-blue-700 disabled:opacity-50">{loadingMore ? "Loading…" : "Load older conversations"}</button> : null}
         </div>
       </aside>
