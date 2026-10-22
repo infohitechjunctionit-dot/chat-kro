@@ -6,6 +6,8 @@ export interface UserRecord {
   email: string;
   passwordHash: string;
   emailVerifiedAt: Date | null;
+  emailVerificationOtp: string | null;
+  otpExpiry: Date | null;
   avatarUrl: string | null;
   accountStatus: "active" | "pending" | "suspended" | "deleted";
   termsAcceptedAt?: Date;
@@ -39,6 +41,8 @@ const userSchema = new Schema<UserRecord>(
     },
     passwordHash: { type: String, required: true, select: false },
     emailVerifiedAt: { type: Date, default: null },
+    emailVerificationOtp: { type: String, default: null, select: false },
+    otpExpiry: { type: Date, default: null },
     termsAcceptedAt: { type: Date, default: null },
     privacyAcceptedAt: { type: Date, default: null },
     avatarUrl: { ...optionalText(2048), default: null, validate: isHttpUrl },
