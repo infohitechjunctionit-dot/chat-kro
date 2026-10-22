@@ -31,7 +31,12 @@ export async function sendActionEmail(input: {
     });
   } catch (error) {
     logger.error(
-      { errorName: error instanceof Error ? error.name : "UnknownError" },
+      { 
+        errorName: error instanceof Error ? error.name : "UnknownError",
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorCode: (error as any)?.code,
+        errorCommand: (error as any)?.command
+      },
       "Action email delivery failed"
     );
     return false;

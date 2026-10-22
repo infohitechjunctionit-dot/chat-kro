@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "db:seed": "tsx src/scripts/seed.ts",
     "db:indexes": "tsx src/scripts/create-indexes.ts",
+    "test:email": "tsx src/scripts/test-email.ts",
     "lint": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
