@@ -68,8 +68,12 @@ app.use("/widget", widgetCors);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(pinoHttp({ logger }));
-// Serve widget script with correct MIME type
+// Serve widget script with correct MIME type and CORS headers
 app.get("/widget.js", (_request, response) => {
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.setHeader("Cache-Control", "public, max-age=3600");
   response.type("application/javascript");
   response.sendFile(resolve(dirname(fileURLToPath(import.meta.url)), "../../widget/dist/widget.js"));
 });
