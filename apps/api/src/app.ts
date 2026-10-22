@@ -26,9 +26,27 @@ export const app = express();
 
 app.disable("x-powered-by");
 
-// Security headers for non-widget routes only (X-Frame-Options would block embedding)
+// Widget routes FIRST - before any other middleware
+// Completely permissive CORS for widget.js and /widget/* routes
+app.use((request, response, next) => {
+  if (request.path === '/widget.js' || request.path.startsWith('/widget')) {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Public-Widget-Id, Authorization");
+    response.setHeader("Access-Control-Max-Age", "600");
+    
+    // Handle OPTIONS preflight
+    if (request.method === 'OPTIONS') {
+      response.status(204).send();
+      return;
+    }
+  }
+  next();
+});
+
+// Security headers for non-widget routes only
 const securityHeaders: RequestHandler = (request, response, next) => {
-  // Skip ALL security headers for widget routes (needs to be embedded anywhere)
+  // Skip ALL security headers for widget routes
   if (request.path.startsWith('/widget') || request.path === '/widget.js') {
     next();
     return;
@@ -50,20 +68,9 @@ const securityHeaders: RequestHandler = (request, response, next) => {
 
 app.use(securityHeaders);
 
-// Widget routes with completely open CORS - no restrictions
-app.use("/widget", widgetCors);
-
-// Widget.js script - completely open CORS
-app.options("/widget.js", (request, response) => {
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.status(204).send();
-});
-
 // Main CORS for dashboard/admin routes only (skip widget routes)
 app.use((request, response, next) => {
-  // Skip main CORS for widget routes - they have completely open CORS
+  // Skip main CORS for widget routes
   if (request.path.startsWith('/widget') || request.path === '/widget.js') {
     next();
     return;
