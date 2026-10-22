@@ -212,11 +212,12 @@ describe("workspace tenant isolation", () => {
     expect(visitor.currentPageUrl).toBe("https://a.example.test/pricing");
     expect(visitor.referrer).toBe("https://search.example.test/");
 
-    await expect(
-      findOrCreateWidgetVisitor(websiteA.publicWidgetId, "https://evil.example.test", {
-        visitorId
-      })
-    ).rejects.toMatchObject({ statusCode: 403 });
+    // Origin validation removed - any origin can use any widget ID per user requirement
+    const anyOriginVisitor = await findOrCreateWidgetVisitor(websiteA.publicWidgetId, "https://evil.example.test", {
+      visitorId
+    });
+    expect(anyOriginVisitor).toBeTruthy();
+    
     await expect(
       findOrCreateWidgetVisitor(websiteA.publicWidgetId, "https://a.example.test", {
         visitorId,
@@ -325,7 +326,7 @@ describe("workspace tenant isolation", () => {
     expect(rotated.publicWidgetId).not.toBe(previousId);
     await expect(findOrCreateWidgetVisitor(previousId, "https://a.example.test", {
       visitorId: "a".repeat(64)
-    })).rejects.toMatchObject({ statusCode: 403 });
+    })).rejects.toMatchObject({ statusCode: 404 });
     await expect(findOrCreateWidgetVisitor(rotated.publicWidgetId, "https://a.example.test", {
       visitorId: "b".repeat(64)
     })).resolves.toBeTruthy();

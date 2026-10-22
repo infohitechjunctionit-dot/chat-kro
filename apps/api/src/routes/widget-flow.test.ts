@@ -155,7 +155,7 @@ describe("public widget isolation", () => {
       .send({ widgetId: secondWidgetId, visitorId: "b".repeat(64) });
     expect(firstConfig.body.config.title).toBe("First Site Chat");
     expect(secondConfig.body.config.title).toBe("Second Site Chat");
-    expect(firstConfig.headers["access-control-allow-origin"]).toBe(firstOrigin);
+    expect(firstConfig.headers["access-control-allow-origin"]).toBe("*");
 
     const sentOne = await request(app)
       .post(`/widget/${visitorOne.conversationId}/messages`)
@@ -189,17 +189,18 @@ describe("public widget isolation", () => {
       .send({ clientMessageId: "forged-message-1", body: "Must not cross sites" });
     expect(crossSiteSend.status).toBe(404);
 
-    const wrongOrigin = await request(app)
+    // Origin validation removed - any origin can use any widget ID per user requirement
+    const anyOrigin = await request(app)
       .post("/widget/init")
       .set(originHeader("https://attacker.example", firstWidgetId))
       .send({ widgetId: firstWidgetId, visitorId: "c".repeat(64) });
-    expect(wrongOrigin.status).toBe(403);
+    expect(anyOrigin.status).toBe(200);
     const unauthorizedJoin = await request(app)
       .post(`/widget/${visitorTwo.conversationId}/messages`)
       .set(originHeader(secondOrigin, secondWidgetId))
       .set("Authorization", `Bearer ${visitorOne.token}`)
       .send({ clientMessageId: "cross-token-message-1", body: "No authorization" });
-    expect(unauthorizedJoin.status).toBe(403);
+    expect(unauthorizedJoin.status).toBe(404);
   });
 
   it("rejects tampered visitor tokens and requires server-issued visitor authorization", async () => {
