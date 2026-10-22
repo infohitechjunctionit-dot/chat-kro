@@ -113,7 +113,7 @@ app.get("/widget.js", async (request, response) => {
     
     // Import fs dynamically
     const { readFile } = await import('fs/promises');
-    const widgetPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../../widget/dist/widget.js");
+    const widgetPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../../apps/widget/dist/widget.js");
     
     const content = await readFile(widgetPath, 'utf-8');
     response.send(content);
