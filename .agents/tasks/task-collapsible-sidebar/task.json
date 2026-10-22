@@ -1,0 +1,7 @@
+{
+  "task_id": "task-collapsible-sidebar",
+  "task_description": "Implement a collapsible sidebar with toggle button, smooth transitions, and responsive behavior. Desktop: sidebar collapses to 60px icons-only or expands to 240px. Mobile: sidebar overlays content. Main content area expands when sidebar is hidden. State persists in localStorage.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null
+}
