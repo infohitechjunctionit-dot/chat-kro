@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Custom width for collapsed sidebar */
+.w-15 {
+  width: 60px;
+}
+
+.lg\:pl-15 {
+  @media (min-width: 1024px) {
+    padding-left: 60px;
+  }
+}
+
 :root {
   color-scheme: light;
   --brand-primary: #4F46E5;
