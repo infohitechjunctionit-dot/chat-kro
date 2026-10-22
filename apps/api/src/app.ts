@@ -68,8 +68,9 @@ app.use("/widget", widgetCors);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(pinoHttp({ logger }));
-// Serve widget script
+// Serve widget script with correct MIME type
 app.get("/widget.js", (_request, response) => {
+  response.type("application/javascript");
   response.sendFile(resolve(dirname(fileURLToPath(import.meta.url)), "../../widget/dist/widget.js"));
 });
 app.use("/health", healthRouter);
