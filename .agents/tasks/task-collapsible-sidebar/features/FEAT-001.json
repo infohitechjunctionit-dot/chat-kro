@@ -1,0 +1,27 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Add sidebar collapse state management with localStorage persistence and hamburger toggle button. Create a collapsed state (useState hook) in dashboard-shell.tsx initialized from localStorage key 'sidebar-collapsed'. Add hamburger/menu icon button in the header with aria-label 'Toggle sidebar' that toggles this state. On state change, persist to localStorage.",
+  "status": "completed",
+  "steps": [
+    "In dashboard-shell.tsx, add useState hook for sidebar collapse state: const [sidebarCollapsed, setSidebarCollapsed] = useState(false)",
+    "Add useEffect to initialize sidebar state from localStorage on mount: read 'sidebar-collapsed' key and setSidebarCollapsed",
+    "Add useEffect to persist sidebar state to localStorage whenever sidebarCollapsed changes",
+    "Import Menu icon from lucide-react (or use existing icon)",
+    "Add hamburger button in the header before the workspace name div. Button should call setSidebarCollapsed(!sidebarCollapsed). Style: size-9 flex items-center justify-center rounded-md hover:bg-slate-100. Include aria-label='Toggle sidebar' for accessibility",
+    "Pass sidebarCollapsed state down to the sidebar element via className conditions (preparation for FEAT-002)"
+  ],
+  "acceptance_criteria": [
+    "Clicking the hamburger button toggles the sidebarCollapsed state",
+    "State persists across page reloads via localStorage",
+    "TypeScript compilation succeeds without errors",
+    "Linting passes without errors"
+  ],
+  "verification": [
+    "npm run typecheck --workspace @live-chat/dashboard",
+    "npm run lint --workspace @live-chat/dashboard",
+    "Manual test: open dashboard, click toggle button, refresh page, verify state persists"
+  ],
+  "blocked_reason": null,
+  "findings": "Successfully implemented sidebar collapse state management with localStorage persistence. The sidebarCollapsed state is now available in dashboard-shell.tsx and is passed to the sidebar element via className. The hamburger toggle button is positioned in the header before the workspace name and only displays on large screens (lg:flex). State persists across page reloads using the 'sidebar-collapsed' localStorage key. The sidebar element has the 'sidebar-collapsed' class applied when collapsed, ready for FEAT-002 to implement the visual collapse behavior."
+}

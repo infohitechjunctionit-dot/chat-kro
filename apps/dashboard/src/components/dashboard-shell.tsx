@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Activity, Bell, Building2, CreditCard, DoorOpen, Globe2, LoaderCircle,
-  MessagesSquare, Settings, Users, UserRound, UsersRound, Zap
+  Menu, MessagesSquare, Settings, Users, UserRound, UsersRound, Zap
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ApiError, apiRequest, clearCsrfToken, type AuthMeResponse, type WorkspaceItem } from "@/lib/api";
@@ -34,6 +34,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [loggingOut, setLoggingOut] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("sidebar-collapsed");
+    if (stored !== null) {
+      setSidebarCollapsed(stored === "true");
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("sidebar-collapsed", String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
 
   useEffect(() => {
     void apiRequest<AuthMeResponse>("/auth/me")
@@ -127,7 +139,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-slate-200/50 bg-gradient-to-b from-white to-slate-50 shadow-lg lg:flex">
+      <aside className={`fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-slate-200/50 bg-gradient-to-b from-white to-slate-50 shadow-lg lg:flex ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
         <Link href="/dashboard" className="flex h-16 items-center gap-2 border-b border-slate-200 px-5 font-semibold transition-all duration-200">
           <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20"><MessagesSquare size={18} /></span>Relay Chat
         </Link>
@@ -151,9 +163,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="min-h-screen lg:pl-60">
         <header className="sticky top-0 z-10 flex min-h-16 items-center justify-between gap-4 border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-md px-4 sm:px-6">
-          <div className="min-w-0">
-            <div className="truncate text-sm font-semibold">{workspace?.name ?? "Workspace"}</div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500"><span className={`size-1.5 rounded-full ${connectionStatus === "Connected" ? "bg-green-500" : "bg-amber-500"}`} />{connectionStatus}</div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              aria-label="Toggle sidebar"
+              className="hidden size-9 items-center justify-center rounded-md hover:bg-slate-100 lg:flex"
+            >
+              <Menu size={18} />
+            </button>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold">{workspace?.name ?? "Workspace"}</div>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500"><span className={`size-1.5 rounded-full ${connectionStatus === "Connected" ? "bg-green-500" : "bg-amber-500"}`} />{connectionStatus}</div>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <label htmlFor="mobile-workspace-select" className="sr-only">Select workspace</label>
