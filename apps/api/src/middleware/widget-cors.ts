@@ -21,22 +21,13 @@ export const widgetCors: RequestHandler = (request, response, next) => {
     next();
     return;
   }
-  let localDevelopmentOrigin = false;
-  try {
-    const parsed = new URL(origin);
-    localDevelopmentOrigin =
-      env.NODE_ENV !== "production" &&
-      env.WIDGET_DEV_MODE === "true" &&
-      parsed.origin === origin &&
-      ["localhost", "127.0.0.1", "[::1]"].includes(parsed.hostname);
-  } catch {
-    next();
-    return;
-  }
+  
+  // TEMPORARY: Allow widget on any domain without origin validation
+  // TODO: Re-enable origin validation in production
   void Website.findOne({
     publicWidgetId: widgetId,
-    status: "active",
-    ...(!localDevelopmentOrigin ? { allowedOrigins: origin } : {})
+    status: "active"
+    // Origin check disabled - widget works on any domain
   })
     .select("_id")
     .then((website) => {
