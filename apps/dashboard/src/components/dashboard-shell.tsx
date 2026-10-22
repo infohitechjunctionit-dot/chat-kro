@@ -190,7 +190,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               aria-label="Toggle sidebar"
-              className="hidden size-9 items-center justify-center rounded-md hover:bg-slate-100 lg:flex"
+              className="flex size-9 items-center justify-center rounded-md hover:bg-slate-100"
             >
               <Menu size={18} />
             </button>
