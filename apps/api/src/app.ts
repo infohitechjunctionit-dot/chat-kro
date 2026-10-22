@@ -68,26 +68,59 @@ app.use("/widget", widgetCors);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(pinoHttp({ logger }));
+// Diagnostic endpoint to check filesystem
+app.get("/debug/paths", async (request, response) => {
+  try {
+    const { readdir, stat } = await import('fs/promises');
+    const currentDir = dirname(fileURLToPath(import.meta.url));
+    
+    const checkPath = async (path: string) => {
+      try {
+        const stats = await stat(path);
+        return { path, exists: true, isDirectory: stats.isDirectory() };
+      } catch {
+        return { path, exists: false };
+      }
+    };
+    
+    const info = {
+      __dirname: currentDir,
+      cwd: process.cwd(),
+      checks: await Promise.all([
+        checkPath(resolve(currentDir, "../../../widget")),
+        checkPath(resolve(currentDir, "../../../widget/dist")),
+        checkPath(resolve(currentDir, "../../../widget/dist/widget.js")),
+        checkPath(resolve(currentDir, "../../widget")),
+        checkPath(resolve(currentDir, "../../widget/dist")),
+        checkPath(resolve(currentDir, "../../widget/dist/widget.js")),
+      ])
+    };
+    
+    response.json(info);
+  } catch (error) {
+    response.status(500).json({ error: String(error) });
+  }
+});
+
 // Serve widget script with correct MIME type and CORS headers
-app.get("/widget.js", (request, response) => {
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader("Cache-Control", "public, max-age=3600");
-  response.type("application/javascript");
-  
-  // Path from compiled dist/app.js to widget/dist/widget.js
-  const widgetPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../../widget/dist/widget.js");
-  
-  // Log the path for debugging
-  logger.info({ widgetPath, exists: require('fs').existsSync(widgetPath) }, "Serving widget.js");
-  
-  response.sendFile(widgetPath, (err) => {
-    if (err) {
-      logger.error({ err, widgetPath }, "Failed to send widget.js");
-      response.status(404).send("Widget file not found");
-    }
-  });
+app.get("/widget.js", async (request, response) => {
+  try {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    response.setHeader("Cache-Control", "public, max-age=3600");
+    response.setHeader("Content-Type", "application/javascript; charset=utf-8");
+    
+    // Import fs dynamically
+    const { readFile } = await import('fs/promises');
+    const widgetPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../../widget/dist/widget.js");
+    
+    const content = await readFile(widgetPath, 'utf-8');
+    response.send(content);
+  } catch (error) {
+    logger.error({ err: error }, "Failed to serve widget.js");
+    response.status(500).send("// Widget file not found");
+  }
 });
 app.use("/health", healthRouter);
 app.use("/auth", authRouter);
