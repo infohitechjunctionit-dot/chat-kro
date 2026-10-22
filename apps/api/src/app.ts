@@ -2,6 +2,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import express from "express";
 import { pinoHttp } from "pino-http";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { widgetCors } from "./middleware/widget-cors.js";
@@ -66,6 +68,10 @@ app.use("/widget", widgetCors);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(pinoHttp({ logger }));
+// Serve widget script
+app.get("/widget.js", (_request, response) => {
+  response.sendFile(resolve(dirname(fileURLToPath(import.meta.url)), "../../widget/dist/widget.js"));
+});
 app.use("/health", healthRouter);
 app.use("/auth", authRouter);
 app.use("/workspaces", workspacesRouter);
