@@ -1,0 +1,7 @@
+{
+  "task_id": "task-premium-inbox-redesign",
+  "task_description": "Redesign the admin dashboard inbox to look premium and professional like Jivo Chat with proper scrolling, avatars, website URLs, and clean typography",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

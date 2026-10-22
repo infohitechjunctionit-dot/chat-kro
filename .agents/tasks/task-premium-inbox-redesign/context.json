@@ -1,0 +1,18 @@
+{
+  "project_type": "Next.js 16 dashboard + Express API + Socket.IO, npm workspaces monorepo",
+  "language": "TypeScript",
+  "build_system": "Next.js with Tailwind CSS 4.3.3, npm workspaces for monorepo structure",
+  "test_framework": "None discovered in dashboard workspace - tests exist in API workspace but not for UI components",
+  "build_command": "npm run build (runs build across all workspaces)",
+  "test_command": "npm run typecheck (TypeScript type checking is the primary verification for dashboard)",
+  "verification_instructions": "After changes: 1) Run npm run typecheck to verify TypeScript types are correct. 2) Run npm run dev to start the dev server. 3) Manually test the inbox page at localhost:3000 by logging in and checking conversation list scrolling, avatar display, website URL display, and responsive behavior.",
+  "snapshot_or_generated_files": null,
+  "environment_constraints": "The dashboard is served at localhost:3000 in dev mode. The API must be running at localhost:4000 for full functionality. MongoDB must be running. Changes to inbox-page.tsx require browser refresh to see updates.",
+  "contribution_requirements": "No specific AGENTS.md or CONTRIBUTING.md found in this project. Follow TypeScript and React best practices. Match existing code style in inbox-page.tsx.",
+  "key_patterns": "1) Single-file component pattern: inbox-page.tsx is 700+ lines containing all inbox logic, types, and UI. 2) Tailwind utility classes with gradient backgrounds (from-indigo-50 to-purple-50 pattern). 3) Socket.IO for real-time updates. 4) Existing avatar pattern: circular div with bg-blue-50, single letter initial. 5) Existing line-clamp-2 utility is available. 6) Mobile-first responsive with lg: breakpoints. 7) Accessibility attributes (aria-label, role) used throughout.",
+  "relevant_files": [
+    "apps/dashboard/src/components/inbox-page.tsx",
+    "apps/dashboard/src/app/globals.css"
+  ],
+  "directory_structure": "apps/dashboard/src/components/ contains page components. apps/dashboard/src/app/ contains Next.js App Router pages and globals.css. apps/dashboard/src/lib/ contains API utilities."
+}
