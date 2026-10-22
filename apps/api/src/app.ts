@@ -1,6 +1,6 @@
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import express from "express";
+import express, { type RequestHandler } from "express";
 import { pinoHttp } from "pino-http";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,7 +25,15 @@ import { widgetRouter } from "./routes/widget.js";
 export const app = express();
 
 app.disable("x-powered-by");
-app.use((_request, response, next) => {
+
+// Security headers for non-widget routes only (X-Frame-Options would block embedding)
+const securityHeaders: RequestHandler = (request, response, next) => {
+  // Skip strict security headers for widget routes (needs to be embedded)
+  if (request.path.startsWith('/widget')) {
+    next();
+    return;
+  }
+  
   response.setHeader("X-Content-Type-Options", "nosniff");
   response.setHeader("X-Frame-Options", "DENY");
   response.setHeader("Referrer-Policy", "no-referrer");
@@ -38,8 +46,23 @@ app.use((_request, response, next) => {
     response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   }
   next();
-});
-app.use(
+};
+
+app.use(securityHeaders);
+
+// Widget CORS must come BEFORE main CORS to handle widget requests
+app.use("/widget", widgetCors);
+
+// Widget.js script needs permissive CORS (already has headers in route handler below)
+
+// Main CORS for dashboard/admin routes only (skip widget routes)
+app.use((request, response, next) => {
+  // Skip main CORS for widget routes - they have their own CORS
+  if (request.path.startsWith('/widget') || request.path === '/widget.js') {
+    next();
+    return;
+  }
+  
   cors({
     origin: (origin, callback) => {
       if (origin === env.WEB_ORIGIN) {
@@ -52,8 +75,9 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
     maxAge: 600
-  })
-);
+  })(request, response, next);
+});
+
 // Rate limiters temporarily disabled for initial deployment
 // app.use("/auth/register", registrationRateLimit);
 // app.use("/auth/verify-email", emailVerificationRateLimit);
@@ -64,7 +88,6 @@ app.use(
 // app.use("/widget/conversation", widgetInitializationRateLimit);
 // app.use("/widget/profile", messageSubmissionRateLimit);
 // app.use("/widget/:conversationId/messages", messageSubmissionRateLimit);
-app.use("/widget", widgetCors);
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(pinoHttp({ logger }));
