@@ -75,7 +75,9 @@ app.get("/widget.js", (_request, response) => {
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
   response.setHeader("Cache-Control", "public, max-age=3600");
   response.type("application/javascript");
-  response.sendFile(resolve(dirname(fileURLToPath(import.meta.url)), "../../widget/dist/widget.js"));
+  // Path from compiled dist/app.js to widget/dist/widget.js
+  const widgetPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../../widget/dist/widget.js");
+  response.sendFile(widgetPath);
 });
 app.use("/health", healthRouter);
 app.use("/auth", authRouter);
