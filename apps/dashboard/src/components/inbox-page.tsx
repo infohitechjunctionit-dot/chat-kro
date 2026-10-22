@@ -579,21 +579,21 @@ export function InboxPage() {
       </div>
     </div>
     {error ? <p role="alert" className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
-    <div className="grid min-h-[min(720px,calc(100dvh-190px))] overflow-hidden rounded-lg border border-slate-200 bg-white lg:grid-cols-[270px_minmax(0,1fr)_270px]">
-      <aside aria-label="Conversation list" className={`${mobileView === "list" ? "flex" : "hidden"} min-h-[560px] flex-col border-b border-slate-200 lg:flex lg:border-b-0 lg:border-r`}>
+    <div className="grid min-h-[min(720px,calc(100dvh-190px))] overflow-hidden rounded-lg border border-slate-200/60 bg-white shadow-xl lg:grid-cols-[270px_minmax(0,1fr)_270px]">
+      <aside aria-label="Conversation list" className={`${mobileView === "list" ? "flex" : "hidden"} min-h-[560px] flex-col border-b border-slate-200 bg-gradient-to-b from-white to-slate-50 lg:flex lg:border-b-0 lg:border-r`}>
         <div className="border-b border-slate-200 p-3">
           <label className="sr-only" htmlFor="inbox-search">Search conversations</label>
           <div className="flex items-center gap-2 rounded-md border border-slate-300 px-2"><Search size={16} className="text-slate-400" /><input id="inbox-search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search visitors or messages" className="min-h-9 min-w-0 flex-1 text-xs outline-none" /></div>
           <nav aria-label="Conversation filters" className="mt-3 grid grid-cols-2 gap-1">
-            {filters.map((item) => <button key={item.id} type="button" onClick={() => setFilter(item.id)} aria-pressed={filter === item.id} className={`min-h-8 rounded px-2 text-left text-xs ${filter === item.id ? "bg-blue-50 font-medium text-blue-700" : "text-slate-600 hover:bg-slate-50"}`}>{item.label}{item.id === "unread" ? <span className="ml-1 text-slate-400">{conversations.filter((conversation) => conversation.agentUnreadCount > 0).length || ""}</span> : null}</button>)}
+            {filters.map((item) => <button key={item.id} type="button" onClick={() => setFilter(item.id)} aria-pressed={filter === item.id} className={`min-h-8 rounded px-2 text-left text-xs transition-all duration-150 ${filter === item.id ? "bg-gradient-to-r from-indigo-50 to-purple-50 font-semibold text-indigo-700 shadow-sm" : "text-slate-600 hover:bg-slate-100/80"}`}>{item.label}{item.id === "unread" ? <span className="ml-1 text-slate-400">{conversations.filter((conversation) => conversation.agentUnreadCount > 0).length || ""}</span> : null}</button>)}
           </nav>
           {["owner", "admin", "supervisor"].includes(role) ? <label className="mt-2 block text-[10px] font-medium text-slate-500">Assigned agent<select value={agentFilter} onChange={(event) => setAgentFilter(event.target.value)} className="mt-1 min-h-8 w-full rounded border border-slate-300 bg-white px-2 text-xs"><option value="">Any agent</option><option value="__unassigned">Unassigned</option>{members.filter((member) => member.userId).map((member) => <option key={member.userId} value={member.userId!}>{member.name || member.email}</option>)}</select></label> : null}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           {loading ? <p role="status" className="p-4 text-sm text-slate-500">Loading conversations…</p>
             : conversations.length === 0 ? <p className="p-4 text-sm text-slate-500">No conversations match this view.</p>
-            : conversations.map((conversation) => <button key={conversation.id} type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); setShowDetails(false); }} aria-current={selectedId === conversation.id ? "true" : undefined} className={`w-full border-b border-slate-100 p-3 text-left hover:bg-slate-50 ${selectedId === conversation.id ? "bg-blue-50" : ""}`}>
-              <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-medium">{visitorLabel(conversation.visitor)}</span>{conversation.agentUnreadCount > 0 ? <span className="min-w-5 rounded-full bg-blue-600 px-1.5 py-0.5 text-center text-[10px] text-white">{conversation.agentUnreadCount}</span> : null}</span>
+            : conversations.map((conversation) => <button key={conversation.id} type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); setShowDetails(false); }} aria-current={selectedId === conversation.id ? "true" : undefined} className={`w-full border-b border-slate-100 p-3 text-left transition-all duration-150 hover:scale-[1.02] ${selectedId === conversation.id ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-600" : "hover:bg-slate-50"}`}>
+              <span className="flex items-center justify-between gap-2"><span className="truncate text-sm font-medium">{visitorLabel(conversation.visitor)}</span>{conversation.agentUnreadCount > 0 ? <span className="min-w-5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 shadow-sm px-1.5 py-0.5 text-center text-[10px] text-white">{conversation.agentUnreadCount}</span> : null}</span>
               <span className="mt-1 block truncate text-xs text-slate-500">{conversation.lastMessagePreview || "No messages yet"}</span>
               <span className="mt-2 flex items-center justify-between gap-2 text-[10px] text-slate-400"><span className="truncate capitalize">{conversation.status} · {conversation.assignedAgentId ? "Assigned" : "Unassigned"}</span><time>{formatTime(conversation.lastMessageAt)}</time></span>
             </button>)}
@@ -601,7 +601,7 @@ export function InboxPage() {
         </div>
       </aside>
 
-      <div className={`${mobileView === "thread" ? "flex" : "hidden"} min-h-[560px] min-w-0 flex-col lg:flex`}>
+      <div className={`${mobileView === "thread" ? "flex" : "hidden"} min-h-[560px] min-w-0 flex-col bg-white/50 backdrop-blur-sm lg:flex`}>
         {selected ? <>
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-3 py-3 sm:px-4">
             <div className="flex min-w-0 items-center gap-2">
@@ -639,7 +639,7 @@ export function InboxPage() {
           <div ref={historyRef} aria-live="polite" aria-label="Conversation messages" className="flex-1 space-y-3 overflow-y-auto p-3 sm:p-4">
             {messages.length >= 50 ? <button type="button" onClick={() => void loadOlderMessages()} className="mx-auto block text-xs text-blue-700 hover:underline">Load older messages</button> : null}
             {!conversationReady ? <p role="status" className="text-center text-xs text-slate-400">Loading conversation…</p>
-              : messages.length ? messages.map((message) => <article key={message.id ?? message.clientMessageId} className={`max-w-[88%] rounded-lg p-3 text-sm ${message.senderType === "agent" ? "ml-auto bg-blue-600 text-white" : message.senderType === "system" ? "mx-auto bg-amber-50 text-slate-600" : "bg-slate-100 text-slate-900"}`}>
+              : messages.length ? messages.map((message) => <article key={message.id ?? message.clientMessageId} className={`max-w-[88%] rounded-lg p-3 text-sm ${message.senderType === "agent" ? "ml-auto bg-gradient-to-br from-indigo-600 to-purple-600 shadow-md shadow-indigo-500/20 text-white" : message.senderType === "system" ? "mx-auto bg-amber-50 text-slate-600" : "bg-slate-100 text-slate-900 shadow-sm"}`}>
                 <p className="whitespace-pre-wrap break-words">{message.body}</p>
                 <div className="mt-1 flex items-center justify-end gap-2 text-[10px] opacity-70"><time>{new Date(message.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>{message.status === "sending" ? <span>Sending…</span> : null}{message.status === "failed" ? <button type="button" onClick={() => sendMessage(undefined, message)} className="underline">Retry</button> : null}{message.senderType === "agent" && message.status === "sent" ? <span>{visitorRead ? "Seen" : "Sent"}</span> : null}</div>
               </article>) : <p className="text-center text-sm text-slate-500">No messages yet. Send a reply to start the conversation.</p>}
@@ -656,7 +656,7 @@ export function InboxPage() {
             <form onSubmit={(event) => sendMessage(event)} className="flex items-end gap-2">
               <label htmlFor="inbox-message" className="sr-only">Write a reply</label>
               <textarea id="inbox-message" value={draft} onChange={(event) => { setDraft(event.target.value); setAgentTyping(true); }} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); sendMessage(); } }} maxLength={10_000} disabled={!conversationReady || selected.status === "resolved"} rows={2} placeholder={selected.status === "resolved" ? "Reopen the conversation to reply" : "Write a reply…"} className="min-h-12 flex-1 resize-y rounded-md border border-slate-300 p-2 text-sm disabled:bg-slate-100" />
-              <button type="submit" disabled={!draft.trim() || !conversationReady || selected.status === "resolved"} aria-label="Send reply" className="flex min-h-10 items-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"><Send size={15} /><span className="hidden sm:inline">Send</span></button>
+              <button type="submit" disabled={!draft.trim() || !conversationReady || selected.status === "resolved"} aria-label="Send reply" className="flex min-h-10 items-center gap-2 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all duration-200 px-3 text-sm font-medium text-white disabled:opacity-50"><Send size={15} /><span className="hidden sm:inline">Send</span></button>
             </form>
             <p className="mt-1 text-right text-[10px] text-slate-400">{draft.length}/10000</p>
           </div>
@@ -675,7 +675,7 @@ export function InboxPage() {
             <form onSubmit={(event) => void submitInternalNote(event)} className="space-y-2">
               <label htmlFor="internal-note" className="sr-only">Write an internal note</label>
               <textarea id="internal-note" value={noteDraft} onChange={(event) => setNoteDraft(event.target.value)} maxLength={5000} rows={3} placeholder="Add a note for your team…" className="w-full resize-y rounded border border-slate-300 p-2 text-xs" />
-              <button type="submit" disabled={!noteDraft.trim() || noteBusy} className="rounded bg-blue-600 px-3 py-2 text-xs font-medium text-white disabled:opacity-50">{noteBusy ? "Saving…" : "Add note"}</button>
+              <button type="submit" disabled={!noteDraft.trim() || noteBusy} className="rounded bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-3 py-2 text-xs font-medium text-white disabled:opacity-50">{noteBusy ? "Saving…" : "Add note"}</button>
             </form>
             <ul className="mt-4 space-y-3">{notes.map((note) => <li key={note.id} className="rounded border border-amber-100 bg-amber-50/50 p-2"><p className="whitespace-pre-wrap break-words text-xs text-slate-800">{note.body}</p><p className="mt-2 text-[10px] text-slate-500">{note.author} · {new Date(note.createdAt).toLocaleString()}</p></li>)}</ul>
             {!notes.length ? <p className="mt-4 text-xs text-slate-500">No internal notes yet.</p> : null}

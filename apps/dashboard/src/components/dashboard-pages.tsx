@@ -52,13 +52,13 @@ function PageState({ message, error = false }: { message: string; error?: boolea
 function DataList({ records, emptyMessage }: { records: RecordValue[]; emptyMessage: string }) {
   if (!records.length) return <PageState message={emptyMessage} />;
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-lg border border-slate-200/60 bg-white shadow-md hover:shadow-lg transition-shadow duration-200">
       {records.map((record, index) => {
         const main = String(record.name ?? record.title ?? record.displayName ?? record.subject ?? record.email ?? record.id ?? `Item ${index + 1}`);
         const sub = [record.domain, record.email, record.status, record.role]
           .filter((value): value is string => typeof value === "string" && value !== main)
           .join(" · ");
-        return <div key={String(record.id ?? index)} className="border-b border-slate-100 px-4 py-3 last:border-0"><div className="text-sm font-medium text-slate-900">{main}</div>{sub ? <div className="mt-1 text-xs text-slate-500">{sub}</div> : null}</div>;
+        return <div key={String(record.id ?? index)} className="border-b border-slate-100 px-4 py-3 last:border-0 hover:bg-slate-50/50 transition-colors"><div className="text-sm font-medium text-slate-900">{main}</div>{sub ? <div className="mt-1 text-xs text-slate-500">{sub}</div> : null}</div>;
       })}
     </div>
   );
@@ -91,11 +91,11 @@ export function DashboardOverview() {
     <p className="mt-1 text-sm text-slate-600">A current view of the workspace from your account data.</p>
     {error ? <div className="mt-5"><PageState message={error} error /></div> : null}
     <div className="mt-6 grid gap-4 sm:grid-cols-2">
-      {[["Open conversations (up to 100)", conversationCount], ["Websites", websiteCount]].map(([label, value]) => <div key={String(label)} className="rounded-lg border border-slate-200 bg-white p-5"><div className="text-sm text-slate-500">{label}</div><div className="mt-2 text-2xl font-semibold">{value === null ? "—" : value}</div></div>)}
+      {[["Open conversations (up to 100)", conversationCount], ["Websites", websiteCount]].map(([label, value]) => <div key={String(label)} className="rounded-lg border border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50 shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-1 p-5"><div className="text-sm text-slate-500">{label}</div><div className="mt-2 text-2xl font-semibold">{value === null ? "—" : value}</div></div>)}
     </div>
     <div className="mt-6 flex flex-wrap gap-3">
-      <Link href="/dashboard/inbox" className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">Open inbox</Link>
-      {hasWorkspace ? <Link href="/dashboard/websites/new" className="rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50">Add website</Link> : null}
+      <Link href="/dashboard/inbox" className="rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2.5 text-sm font-medium text-white">Open inbox</Link>
+      {hasWorkspace ? <Link href="/dashboard/websites/new" className="rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium hover:bg-slate-50 transition-all duration-200">Add website</Link> : null}
     </div>
   </section>;
 }
@@ -184,7 +184,7 @@ export function DashboardDataPage({ section, itemId }: { section: string; itemId
           ? details ? <dl className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:grid-cols-2">{Object.entries(details).filter(([key, value]) => key !== "_id" && key !== "__v" && value !== undefined && (typeof value !== "object" || value === null)).map(([key, value]) => <div key={key}><dt className="text-xs capitalize text-slate-500">{key.replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`)}</dt><dd className="mt-1 break-all text-sm text-slate-900">{String(value ?? "—")}</dd></div>)}</dl> : <PageState message="No details are available." />
           : <DataList records={records} emptyMessage={`No ${title.toLowerCase()} to show yet.`} />
       : null}
-    {section === "websites" && !itemId ? <Link href="/dashboard/websites/new" className="mt-4 inline-flex rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">Add website</Link> : null}
+    {section === "websites" && !itemId ? <Link href="/dashboard/websites/new" className="mt-4 inline-flex rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2.5 text-sm font-medium text-white">Add website</Link> : null}
   </section>;
 }
 
@@ -503,10 +503,10 @@ function WebsiteCreatePage() {
     <h1 className="text-xl font-semibold">Add a website</h1>
     <p className="mt-1 text-sm text-slate-600">Allowed origin is set to the exact website origin.</p>
     {error ? <div className="mt-4"><PageState message={error} error /></div> : null}
-    {created ? <div className="mt-5 rounded-lg border border-slate-200 bg-white p-5"><h2 className="font-semibold">Website created</h2><p className="mt-2 text-sm">{created.name} · {created.domain}</p><label className="mt-4 block text-xs font-medium text-slate-600">Public widget ID<input readOnly value={created.publicWidgetId} className="mt-1 w-full rounded-md border border-slate-300 bg-slate-50 p-2 font-mono text-xs" /></label><label className="mt-4 block text-xs font-medium text-slate-600">Installation snippet<textarea readOnly rows={8} value={widgetInstallSnippet(created.publicWidgetId)} className="mt-1 w-full resize-none rounded-md border border-slate-300 bg-slate-50 p-2 font-mono" /></label><button onClick={() => router.push(`/dashboard/websites/${created.id}`)} className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white">View website settings</button></div> : <form onSubmit={(event) => void submit(event)} className="mt-5 space-y-4 rounded-lg border border-slate-200 bg-white p-5">
+    {created ? <div className="mt-5 rounded-lg border border-slate-200 bg-white p-5"><h2 className="font-semibold">Website created</h2><p className="mt-2 text-sm">{created.name} · {created.domain}</p><label className="mt-4 block text-xs font-medium text-slate-600">Public widget ID<input readOnly value={created.publicWidgetId} className="mt-1 w-full rounded-md border border-slate-300 bg-slate-50 p-2 font-mono text-xs" /></label><label className="mt-4 block text-xs font-medium text-slate-600">Installation snippet<textarea readOnly rows={8} value={widgetInstallSnippet(created.publicWidgetId)} className="mt-1 w-full resize-none rounded-md border border-slate-300 bg-slate-50 p-2 font-mono" /></label><button onClick={() => router.push(`/dashboard/websites/${created.id}`)} className="mt-4 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2 text-sm font-medium text-white">View website settings</button></div> : <form onSubmit={(event) => void submit(event)} className="mt-5 space-y-4 rounded-lg border border-slate-200 bg-white p-5">
       <label className="block text-sm font-medium">Website name<input name="name" required maxLength={120} className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm" /></label>
       <label className="block text-sm font-medium">Domain<input name="domain" required maxLength={253} placeholder="example.com" className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm" /></label>
-      <button disabled={busy || !workspaceId} className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">{busy ? "Adding…" : "Add website"}</button>
+      <button disabled={busy || !workspaceId} className="rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">{busy ? "Adding…" : "Add website"}</button>
     </form>}
   </section>;
 }
@@ -693,7 +693,7 @@ function WebsiteSettingsEditor({ website, workspaceId }: { website: RecordValue;
               <label className="flex items-center gap-2 text-sm"><input name="collectEmail" type="checkbox" defaultChecked={settings.collectEmail === true} />Ask visitor email</label>
               <label className="flex items-center gap-2 text-sm"><input name="offlineContactForm" type="checkbox" defaultChecked={settings.offlineContactForm === true} />Show offline contact fields</label>
             </fieldset>
-            <button disabled={busy} className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">{busy ? "Saving…" : "Save widget settings"}</button>
+            <button disabled={busy} className="rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60">{busy ? "Saving…" : "Save widget settings"}</button>
           </form>
           <div className="mt-5 rounded-lg border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between gap-2"><h2 className="font-semibold">Installation code</h2><button type="button" onClick={() => void copySnippet()} disabled={!snippet.startsWith("<script>")} className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium disabled:opacity-50">{copied ? "Copied" : "Copy"}</button></div>

@@ -127,9 +127,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-slate-200 bg-white lg:flex">
-        <Link href="/dashboard" className="flex h-16 items-center gap-2 border-b border-slate-200 px-5 font-semibold">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-blue-600 text-white"><MessagesSquare size={18} /></span>Relay Chat
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-slate-200/50 bg-gradient-to-b from-white to-slate-50 shadow-lg lg:flex">
+        <Link href="/dashboard" className="flex h-16 items-center gap-2 border-b border-slate-200 px-5 font-semibold transition-all duration-200">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20"><MessagesSquare size={18} /></span>Relay Chat
         </Link>
         <div className="border-b border-slate-200 p-3">
           <label htmlFor="workspace-select" className="sr-only">Select workspace</label>
@@ -141,7 +141,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <nav aria-label="Dashboard" className="flex-1 space-y-1 overflow-y-auto p-3">
           {visibleNavigation.map(({ label, href, icon: Icon }) => {
             const active = pathname === href || (href !== "/dashboard/inbox" && pathname.startsWith(`${href}/`));
-            return <Link key={href} href={href} className={`flex min-h-10 items-center gap-3 rounded-md px-3 text-sm ${active ? "bg-blue-50 font-medium text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}><Icon size={17} />{label}</Link>;
+            return <Link key={href} href={href} className={`flex min-h-10 items-center gap-3 rounded-md px-3 text-sm transition-all duration-200 ${active ? "bg-gradient-to-r from-indigo-50 to-purple-50 font-semibold text-indigo-700 shadow-sm border-l-4 border-indigo-600" : "text-slate-600 hover:bg-slate-100/80 hover:translate-x-1"}`}><Icon size={17} />{label}</Link>;
           })}
         </nav>
         <div className="border-t border-slate-200 p-3">
@@ -150,7 +150,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="min-h-screen lg:pl-60">
-        <header className="sticky top-0 z-10 flex min-h-16 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 sm:px-6">
+        <header className="sticky top-0 z-10 flex min-h-16 items-center justify-between gap-4 border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-md px-4 sm:px-6">
           <div className="min-w-0">
             <div className="truncate text-sm font-semibold">{workspace?.name ?? "Workspace"}</div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500"><span className={`size-1.5 rounded-full ${connectionStatus === "Connected" ? "bg-green-500" : "bg-amber-500"}`} />{connectionStatus}</div>
@@ -162,7 +162,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </select>
             <details className="relative">
               <summary aria-label={`Notifications (${notifications.length})`} className="flex size-9 cursor-pointer list-none items-center justify-center rounded-md text-slate-600 hover:bg-slate-100"><Bell size={18} />{notifications.length > 0 ? <span className="absolute right-1 top-1 size-2 rounded-full bg-blue-600" /> : null}</summary>
-              <div className="absolute right-0 top-11 z-20 w-72 rounded-lg border border-slate-200 bg-white p-3 shadow-lg">
+              <div className="absolute right-0 top-11 z-20 w-72 rounded-lg border border-slate-200/60 bg-white shadow-2xl backdrop-blur-sm p-3">
                 <div className="mb-2 text-sm font-semibold">Notifications</div>
                 {notifications.length ? <ul className="space-y-2">{notifications.map((item) => <li key={item.id} className="border-t border-slate-100 pt-2 text-xs text-slate-600">{item.type.replaceAll("_", " ")} <time className="block text-[10px] text-slate-400">{new Date(item.createdAt).toLocaleString()}</time></li>)}</ul> : <p className="py-3 text-xs text-slate-500">You’re all caught up.</p>}
               </div>

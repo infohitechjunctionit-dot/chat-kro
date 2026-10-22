@@ -17,7 +17,7 @@ export function AuthCard({
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
       <section className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-7">
         <Link href="/" className="mb-7 inline-flex items-center gap-2 font-semibold text-slate-900">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20">
             <MessagesSquare size={18} aria-hidden="true" />
           </span>
           Relay Chat

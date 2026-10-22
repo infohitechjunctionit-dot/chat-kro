@@ -53,7 +53,7 @@ function WidgetDemoContent() {
       <form className="mt-5 flex flex-col gap-3 sm:flex-row" onSubmit={submit}>
         <label className="sr-only" htmlFor="demo-widget-id">Public widget ID</label>
         <input id="demo-widget-id" value={widgetId} onChange={(event) => setWidgetId(event.target.value)} maxLength={64} className="min-h-11 flex-1 rounded-md border border-slate-300 px-3 font-mono text-sm" placeholder="Public widget ID" />
-        <button className="min-h-11 rounded-md bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-700">Load widget</button>
+        <button className="min-h-11 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-5 text-sm font-semibold text-white">Load widget</button>
       </form>
       {error ? <p role="alert" className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
       {loaded && !error ? <p role="status" className="mt-4 text-sm text-green-700">Widget script loaded. Use the launcher at the bottom-right or bottom-left.</p> : null}

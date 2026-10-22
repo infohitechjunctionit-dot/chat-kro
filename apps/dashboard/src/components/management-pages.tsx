@@ -17,7 +17,7 @@ type Usage = {
   usage: Record<string, number | string>;
 };
 const fieldClass = "min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm";
-const primaryButton = "min-h-9 rounded-md bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50";
+const primaryButton = "min-h-9 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-3 text-xs font-semibold text-white disabled:opacity-50";
 const apiUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000").replace(/\/$/, "");
 
 function useWorkspaceContext() {

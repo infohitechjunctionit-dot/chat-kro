@@ -134,7 +134,7 @@ export function OnboardingWizard() {
     <main className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-2xl">
         <Link href="/" className="mb-8 inline-flex items-center gap-2 font-semibold text-slate-900">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-blue-600 text-white"><MessagesSquare size={18} /></span>
+          <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20"><MessagesSquare size={18} /></span>
           Relay Chat
         </Link>
         <section className="rounded-xl border border-slate-200 bg-white p-6 sm:p-8">
@@ -152,7 +152,7 @@ export function OnboardingWizard() {
               <p className="mt-2 text-sm text-slate-600">This is your team’s home for websites and conversations.</p>
               <form className="mt-6 space-y-4" onSubmit={createWorkspace}>
                 <label className="block text-sm font-medium text-slate-700">Workspace name<input name="name" required minLength={1} maxLength={120} className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100" /></label>
-                <button disabled={busy} className="min-h-10 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">{busy ? "Creating…" : "Create workspace"}</button>
+                <button disabled={busy} className="min-h-10 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 text-sm font-semibold text-white disabled:opacity-60">{busy ? "Creating…" : "Create workspace"}</button>
               </form>
             </>
           ) : null}
@@ -163,7 +163,7 @@ export function OnboardingWizard() {
               <form className="mt-6 space-y-4" onSubmit={createWebsite}>
                 <label className="block text-sm font-medium text-slate-700">Website name<input name="name" required minLength={1} maxLength={120} placeholder="Main website" className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100" /></label>
                 <label className="block text-sm font-medium text-slate-700">Website domain<input name="domain" type="text" required maxLength={253} placeholder="example.com" className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100" /><span className="mt-1 block text-xs font-normal text-slate-500">The exact https origin is allowlisted automatically.</span></label>
-                <button disabled={busy} className="min-h-10 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">{busy ? "Adding website…" : "Add website"}</button>
+                <button disabled={busy} className="min-h-10 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 text-sm font-semibold text-white disabled:opacity-60">{busy ? "Adding website…" : "Add website"}</button>
               </form>
             </>
           ) : null}
@@ -181,7 +181,7 @@ export function OnboardingWizard() {
                 <textarea id="install-snippet" readOnly rows={8} value={installSnippet} className="w-full resize-none rounded-md border border-slate-300 bg-slate-50 p-3 font-mono text-xs text-slate-700" />
                 <p className="mt-2 text-xs leading-5 text-amber-800">The website and public ID are saved now. The snippet is generated once widget bundle delivery is configured for this dashboard deployment.</p>
               </div>
-              <button onClick={() => router.replace("/dashboard")} className="mt-6 min-h-10 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">Continue to dashboard</button>
+              <button onClick={() => router.replace("/dashboard")} className="mt-6 min-h-10 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 text-sm font-semibold text-white">Continue to dashboard</button>
             </>
           ) : null}
         </section>
