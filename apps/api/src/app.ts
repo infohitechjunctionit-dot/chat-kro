@@ -28,8 +28,8 @@ app.disable("x-powered-by");
 
 // Security headers for non-widget routes only (X-Frame-Options would block embedding)
 const securityHeaders: RequestHandler = (request, response, next) => {
-  // Skip strict security headers for widget routes (needs to be embedded)
-  if (request.path.startsWith('/widget')) {
+  // Skip ALL security headers for widget routes (needs to be embedded anywhere)
+  if (request.path.startsWith('/widget') || request.path === '/widget.js') {
     next();
     return;
   }
@@ -50,14 +50,20 @@ const securityHeaders: RequestHandler = (request, response, next) => {
 
 app.use(securityHeaders);
 
-// Widget CORS must come BEFORE main CORS to handle widget requests
+// Widget routes with completely open CORS - no restrictions
 app.use("/widget", widgetCors);
 
-// Widget.js script needs permissive CORS (already has headers in route handler below)
+// Widget.js script - completely open CORS
+app.options("/widget.js", (request, response) => {
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.status(204).send();
+});
 
 // Main CORS for dashboard/admin routes only (skip widget routes)
 app.use((request, response, next) => {
-  // Skip main CORS for widget routes - they have their own CORS
+  // Skip main CORS for widget routes - they have completely open CORS
   if (request.path.startsWith('/widget') || request.path === '/widget.js') {
     next();
     return;
