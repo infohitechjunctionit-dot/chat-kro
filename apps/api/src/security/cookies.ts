@@ -7,7 +7,7 @@ export const csrfCookieName = "relay_csrf";
 export const sessionCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: env.NODE_ENV === "production",
-  sameSite: "strict",
+  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
   path: "/",
   maxAge: 30 * 24 * 60 * 60 * 1000
 };
@@ -15,7 +15,7 @@ export const sessionCookieOptions: CookieOptions = {
 export const csrfCookieOptions: CookieOptions = {
   httpOnly: false,
   secure: env.NODE_ENV === "production",
-  sameSite: "strict",
+  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
   path: "/",
   maxAge: 30 * 24 * 60 * 60 * 1000
 };
@@ -23,12 +23,12 @@ export const csrfCookieOptions: CookieOptions = {
 export const clearSessionCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: env.NODE_ENV === "production",
-  sameSite: "strict",
+  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
   path: "/"
 };
 
 export const clearCsrfCookieOptions: CookieOptions = {
   secure: env.NODE_ENV === "production",
-  sameSite: "strict",
+  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
   path: "/"
 };
