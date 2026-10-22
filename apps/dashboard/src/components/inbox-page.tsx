@@ -580,8 +580,8 @@ export function InboxPage() {
     </div>
     {error ? <p role="alert" className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
     <div className="grid min-h-[min(720px,calc(100dvh-190px))] overflow-hidden rounded-lg border border-slate-200/60 bg-white shadow-xl lg:grid-cols-[270px_minmax(0,1fr)_270px]">
-      <aside aria-label="Conversation list" className={`${mobileView === "list" ? "flex" : "hidden"} min-h-[560px] flex-col border-b border-slate-200 bg-gradient-to-b from-white to-slate-50 lg:flex lg:border-b-0 lg:border-r`}>
-        <div className="border-b border-slate-200 p-3">
+      <aside aria-label="Conversation list" className={`${mobileView === "list" ? "flex" : "hidden"} h-full min-h-[560px] flex-col border-b border-slate-200 bg-gradient-to-b from-white to-slate-50 lg:flex lg:border-b-0 lg:border-r`}>
+        <div className="flex-none border-b border-slate-200 p-3">
           <label className="sr-only" htmlFor="inbox-search">Search conversations</label>
           <div className="flex items-center gap-2 rounded-md border border-slate-300 px-2"><Search size={16} className="text-slate-400" /><input id="inbox-search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search visitors or messages" className="min-h-9 min-w-0 flex-1 text-xs outline-none" /></div>
           <nav aria-label="Conversation filters" className="mt-3 grid grid-cols-2 gap-1">

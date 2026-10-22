@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-001",
+  "type": "fix",
+  "description": "Fix conversation list scrolling by refactoring the aside layout to use proper flex structure. Currently the list doesn't scroll properly. The fix uses: outer container 'flex flex-col h-full', header section 'flex-none' for search/filters, and scrolling list 'flex-1 overflow-y-auto'. Remove any overflow:hidden that blocks scroll.",
+  "status": "completed",
+  "steps": [
+    "1. In apps/dashboard/src/components/inbox-page.tsx, locate the conversation list <aside> element (around line 582) with className containing 'min-h-[560px] flex-col'",
+    "2. Add 'h-full' to the aside className to ensure it has a defined height for flex children to work against",
+    "3. Verify the header <div> with search and filters (around line 583) has 'flex-none' to prevent it from shrinking",
+    "4. Verify the scrolling list container <div> (around line 591) has both 'flex-1' and 'overflow-y-auto' so it takes remaining space and scrolls",
+    "5. Check that no parent elements have 'overflow-hidden' that would prevent scrolling - the main grid container should have 'overflow-hidden' but children should be able to scroll internally"
+  ],
+  "acceptance_criteria": [
+    "The conversation list scrolls vertically when there are more conversations than fit in the viewport",
+    "The search bar and filter buttons remain fixed at the top of the sidebar",
+    "The 'Load older conversations' button appears at the bottom of the scrollable area",
+    "Scrolling works on both desktop (lg:) and mobile views"
+  ],
+  "verification": [
+    "Run 'npm run typecheck' in the project root to verify TypeScript compilation",
+    "Start the dev server with 'npm run dev' and navigate to the inbox page",
+    "Create or load enough conversations to exceed the viewport height",
+    "Verify the conversation list scrolls while the header stays fixed",
+    "Test on both desktop (>1024px) and mobile (<1024px) viewport sizes"
+  ],
+  "blocked_reason": null,
+  "findings": "Successfully fixed conversation list scrolling by adding h-full to aside and flex-none to header. The scrolling container already had flex-1 and overflow-y-auto. TypeScript compilation passed."
+}
