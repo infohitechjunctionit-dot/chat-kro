@@ -1,0 +1,20 @@
+{
+  "project_type": "Next.js 16.4 App Router dashboard with TypeScript and Tailwind CSS 4.3",
+  "language": "TypeScript",
+  "build_system": "Next.js with npm workspaces. Tailwind CSS via @tailwindcss/postcss",
+  "test_framework": "No test framework currently configured in dashboard package",
+  "build_command": "npm run build --workspace @live-chat/dashboard",
+  "test_command": "npm run typecheck --workspace @live-chat/dashboard && npm run lint --workspace @live-chat/dashboard",
+  "verification_instructions": "Run typecheck to ensure TypeScript validity, run lint to check code style, run dev server and manually test sidebar toggle on both desktop and mobile viewports",
+  "snapshot_or_generated_files": "None that need regeneration for this task",
+  "environment_constraints": "Dashboard dev server runs on localhost:3000. Do not restart or interfere with API server on localhost:4000",
+  "contribution_requirements": "No specific AGENTS.md or CONTRIBUTING.md found in project. Follow existing code patterns and conventions",
+  "key_patterns": "All components use local useState hooks for state management. No global state library. Tailwind utility classes for styling with CSS custom properties in globals.css. Lucide-react for icons. Components are client components marked with 'use client'. Mobile breakpoint is lg: (1024px) for sidebar visibility",
+  "relevant_files": [
+    "c:\\Users\\satya\\Desktop\\New folder\\chat system\\apps\\dashboard\\src\\components\\dashboard-shell.tsx",
+    "c:\\Users\\satya\\Desktop\\New folder\\chat system\\apps\\dashboard\\src\\app\\dashboard\\layout.tsx",
+    "c:\\Users\\satya\\Desktop\\New folder\\chat system\\apps\\dashboard\\src\\app\\globals.css",
+    "c:\\Users\\satya\\Desktop\\New folder\\chat system\\apps\\dashboard\\package.json"
+  ],
+  "directory_structure": "apps/dashboard/src/app/ contains Next.js App Router pages and layouts. apps/dashboard/src/components/ contains reusable React components. dashboard-shell.tsx is the main layout component containing sidebar, header, and main content area. Currently sidebar is fixed at w-60 (240px) on lg+ screens, hidden on mobile with horizontal nav bar"
+}
