@@ -52,25 +52,11 @@ export async function findOrCreateWidgetVisitor(
   if (!parsed.success) throw new AppError("Invalid visitor details", 400, "VALIDATION_ERROR");
   const website = await Website.findOne({
     publicWidgetId,
-    status: "active",
-    ...(env.NODE_ENV !== "production" && env.WIDGET_DEV_MODE === "true" &&
-    origin &&
-    ["localhost", "127.0.0.1", "[::1]"].includes(new URL(origin).hostname)
-      ? {}
-      : { allowedOrigins: origin })
+    status: "active"
   }).select("_id workspaceId allowedOrigins");
-  if (!website || !origin) throw new AppError("Widget not found", 404, "NOT_FOUND");
+  if (!website) throw new AppError("Widget not found", 404, "NOT_FOUND");
 
   const pageUrl = parsed.data.currentPageUrl ? new URL(parsed.data.currentPageUrl) : undefined;
-  const isLocalDevPage =
-    env.NODE_ENV !== "production" &&
-    env.WIDGET_DEV_MODE === "true" &&
-    origin === pageUrl?.origin &&
-    !!pageUrl &&
-    ["localhost", "127.0.0.1", "[::1]"].includes(pageUrl.hostname);
-  if (pageUrl && !website.allowedOrigins.includes(pageUrl.origin) && !isLocalDevPage) {
-    throw new AppError("Page origin is not allowed", 403, "ORIGIN_NOT_ALLOWED");
-  }
   if (pageUrl) {
     pageUrl.search = "";
     pageUrl.hash = "";

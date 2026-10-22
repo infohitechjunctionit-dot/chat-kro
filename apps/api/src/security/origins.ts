@@ -24,15 +24,14 @@ export async function assertWidgetOrigin(
   publicWidgetId: string,
   origin: string | undefined
 ): Promise<void> {
-  if (!origin || publicWidgetId.length > 64 || !isAllowedOrigin(origin, [origin])) {
-    throw new AppError("Widget origin is not allowed", 403, "ORIGIN_NOT_ALLOWED");
+  if (publicWidgetId.length > 64) {
+    throw new AppError("Invalid widget ID", 400, "VALIDATION_ERROR");
   }
   const website = await Website.findOne({
     publicWidgetId,
-    status: "active",
-    ...(isAllowedOrigin(origin, []) ? {} : { allowedOrigins: origin })
+    status: "active"
   }).select("_id");
   if (!website) {
-    throw new AppError("Widget origin is not allowed", 403, "ORIGIN_NOT_ALLOWED");
+    throw new AppError("Widget not found", 404, "NOT_FOUND");
   }
 }

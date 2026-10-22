@@ -9,7 +9,7 @@ import { persistConversationMessage } from "./message-service.js";
 import { findOrCreateWidgetVisitor } from "./visitor-service.js";
 
 const initSchema = z.object({
-  widgetId: z.string().regex(/^[A-Za-z0-9_-]{32}$/),
+  widgetId: z.string().regex(/^[A-Za-z0-9_-]{20,128}$/),
   visitorId: z.string().trim().min(32).max(128),
   currentPageUrl: z.string().url().max(2048).optional(),
   referrer: z.string().url().max(2048).optional(),
@@ -76,22 +76,7 @@ function parseVisitorSessionToken(token: string): VisitorClaims {
   return parsed.data;
 }
 
-function assertOriginMatchesWebsite(origin: string | undefined, website: { allowedOrigins: string[] }) {
-  if (!origin) throw new AppError("Widget origin is required", 403, "ORIGIN_NOT_ALLOWED");
-  let parsed: URL;
-  try {
-    parsed = new URL(origin);
-  } catch {
-    throw new AppError("Widget origin is not allowed", 403, "ORIGIN_NOT_ALLOWED");
-  }
-  const localDev =
-    env.NODE_ENV !== "production" &&
-    env.WIDGET_DEV_MODE === "true" &&
-    ["localhost", "127.0.0.1", "[::1]"].includes(parsed.hostname);
-  if (parsed.origin !== origin || (!website.allowedOrigins.includes(origin) && !localDev)) {
-    throw new AppError("Widget origin is not allowed", 403, "ORIGIN_NOT_ALLOWED");
-  }
-}
+
 
 function isWithinAvailability(
   schedule: Array<{ day: number; start: string; end: string }>,
@@ -138,7 +123,6 @@ export async function initializeWidget(input: unknown, origin: string | undefine
     status: "active"
   }).select("name widgetSettings allowedOrigins");
   if (!website) throw new AppError("Widget not found", 404, "NOT_FOUND");
-  assertOriginMatchesWebsite(origin, website);
   const settings = website.widgetSettings;
   return {
     visitorToken: createVisitorSessionToken({
@@ -215,7 +199,6 @@ export async function verifyVisitorSession(token: string, origin: string | undef
     })
   ]);
   if (!website || !visitor) throw new AppError("Visitor session is no longer active", 401, "WIDGET_SESSION_INVALID");
-  assertOriginMatchesWebsite(origin, website);
   return {
     ...claims,
     websiteSettings: {
