@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "npm run build --workspace @live-chat/widget && tsc -p tsconfig.json",
+    "prebuild": "cd ../../ && npm run build --workspace @live-chat/widget",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "db:seed": "tsx src/scripts/seed.ts",
     "db:indexes": "tsx src/scripts/create-indexes.ts",
