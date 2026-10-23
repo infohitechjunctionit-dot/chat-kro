@@ -531,13 +531,13 @@ async function bootstrap(script: HTMLScriptElement): Promise<void> {
   async function setOpen(open: boolean) {
     isOpen = open;
     panel.hidden = !open;
+    launcher.hidden = open; // Hide launcher when chat is open
     launcher.setAttribute("aria-expanded", String(open));
     if (open) {
       unread = 0;
       unreadBadge.hidden = true;
       unreadBadge.textContent = "";
       launcher.setAttribute("aria-label", config.launcherLabel || "Open chat");
-      launcher.focus();
       try {
         if (!conversationId) await openConversation();
         await saveProfile();
@@ -546,6 +546,7 @@ async function bootstrap(script: HTMLScriptElement): Promise<void> {
         showError(error instanceof Error ? error.message : "Unable to connect to chat.");
       }
     } else {
+      launcher.hidden = false; // Show launcher when chat is closed
       launcher.focus();
     }
   }
