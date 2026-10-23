@@ -57,10 +57,6 @@ export async function findOrCreateWidgetVisitor(
   if (!website) throw new AppError("Widget not found", 404, "NOT_FOUND");
 
   const pageUrl = parsed.data.currentPageUrl ? new URL(parsed.data.currentPageUrl) : undefined;
-  if (pageUrl) {
-    pageUrl.search = "";
-    pageUrl.hash = "";
-  }
   const referrerUrl = parsed.data.referrer ? new URL(parsed.data.referrer) : undefined;
   if (referrerUrl) {
     if (!["https:", "http:"].includes(referrerUrl.protocol)) {

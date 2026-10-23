@@ -197,7 +197,7 @@ async function bootstrap(script: HTMLScriptElement): Promise<void> {
   mountedScripts.add(script);
   const apiUrl = apiUrlFromScript(script);
   const storedVisitorId = visitorId(widgetId);
-  const currentPageUrl = `${window.location.origin}${window.location.pathname}`;
+  const currentPageUrl = window.location.href;
   const initResponse = await fetch(`${apiUrl}/widget/init`, {
     method: "POST",
     mode: "cors",
