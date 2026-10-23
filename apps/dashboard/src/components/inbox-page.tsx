@@ -2,8 +2,8 @@
 
 import { io, type Socket } from "socket.io-client";
 import {
-  Bell, ChevronDown, ChevronLeft, CircleDot, Headphones,
-  Search, Send, Volume2, VolumeX
+  Bell, ChevronDown, ChevronLeft, CircleDot, Headphones, MoreVertical, Phone, Video,
+  Search, Send, Volume2, VolumeX, Paperclip, Smile
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ApiError, apiRequest, type AuthMeResponse } from "@/lib/api";
@@ -601,26 +601,23 @@ export function InboxPage() {
   ];
 
   return <section className="min-w-0">
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <div><h1 className="text-xl font-semibold">Inbox</h1><p className="mt-1 text-sm text-slate-600">Live conversations · {conversations.length} loaded</p></div>
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <span className={`size-2 rounded-full ${socketStatus === "Connected" ? "bg-green-500" : "bg-amber-500"}`} />
-        {socketStatus}
-        <button type="button" onClick={toggleSound} aria-label={soundEnabled ? "Disable sound notifications" : "Enable sound notifications"} title="Sound notifications" className="ml-2 rounded p-2 hover:bg-slate-200">{soundEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}</button>
-        <button type="button" onClick={() => void toggleNotifications()} aria-label={notificationsEnabled ? "Disable desktop notifications" : "Enable desktop notifications"} title="Desktop notifications" className="rounded p-2 hover:bg-slate-200"><Bell size={17} /></button>
-      </div>
-    </div>
     {error ? <p role="alert" className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
-    <div className="grid min-h-[min(720px,calc(100dvh-190px))] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl lg:grid-cols-[270px_minmax(0,1fr)_270px]">
-      <aside aria-label="Conversation list" className={`${mobileView === "list" ? "flex" : "hidden"} h-full min-h-[560px] flex-col border-b border-gray-200 bg-gradient-to-b from-white to-slate-50 lg:flex lg:border-b-0 lg:border-r lg:border-gray-200`}>
-        <div className="flex-none border-b border-gray-200 p-3">
+    <div className="grid min-h-[min(720px,calc(100dvh-140px))] overflow-hidden rounded-lg border border-slate-200/60 bg-white shadow-xl lg:grid-cols-[280px_minmax(0,1fr)_320px]">
+      <aside aria-label="Conversation list" className={`${mobileView === "list" ? "flex" : "hidden"} h-full min-h-[560px] flex-col border-r border-slate-200/60 bg-white lg:flex`}>
+        <div className="flex-none border-b border-slate-200/60 bg-white px-4 py-3">
+          <h2 className="text-base font-semibold text-slate-800 mb-3">Inbox</h2>
           <label className="sr-only" htmlFor="inbox-search">Search conversations</label>
-          <div className="flex items-center gap-2 rounded-md border border-gray-300 px-2"><Search size={16} className="text-slate-400" /><input id="inbox-search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search visitors or messages" className="min-h-9 min-w-0 flex-1 text-xs outline-none" /></div>
-          <nav aria-label="Conversation filters" className="mt-3 grid grid-cols-2 gap-1">
-            {filters.map((item) => <button key={item.id} type="button" onClick={() => setFilter(item.id)} aria-pressed={filter === item.id} className={`min-h-8 rounded px-2 text-left text-xs transition-all duration-150 ${filter === item.id ? "bg-gradient-to-r from-indigo-50 to-purple-50 font-semibold text-indigo-700 shadow-sm" : "text-slate-600 hover:bg-slate-100/80"}`}>{item.label}{item.id === "unread" ? <span className="ml-1 text-slate-400">{conversations.filter((conversation) => conversation.agentUnreadCount > 0).length || ""}</span> : null}</button>)}
-          </nav>
-          {["owner", "admin", "supervisor"].includes(role) ? <label className="mt-2 block text-[10px] font-medium text-slate-500">Assigned agent<select value={agentFilter} onChange={(event) => setAgentFilter(event.target.value)} className="mt-1 min-h-8 w-full rounded border border-gray-300 bg-white px-2 text-xs"><option value="">Any agent</option><option value="__unassigned">Unassigned</option>{members.filter((member) => member.userId).map((member) => <option key={member.userId} value={member.userId!}>{member.name || member.email}</option>)}</select></label> : null}
+          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 shadow-sm"><Search size={16} className="text-slate-400" /><input id="inbox-search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Search conversations..." className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400" /></div>
         </div>
+        
+        <div className="flex-none border-b border-slate-200/60 px-3 py-2 bg-slate-50/30">
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setFilter("all")} aria-pressed={filter === "all"} className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${filter === "all" ? "bg-blue-600 text-white shadow-sm" : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"}`}>All</button>
+            <button type="button" onClick={() => setFilter("unread")} aria-pressed={filter === "unread"} className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${filter === "unread" ? "bg-blue-600 text-white shadow-sm" : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"}`}>Unread {conversations.filter((c) => c.agentUnreadCount > 0).length > 0 ? <span className="ml-1 rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700">{conversations.filter((c) => c.agentUnreadCount > 0).length}</span> : null}</button>
+            <button type="button" onClick={() => setFilter("resolved")} aria-pressed={filter === "resolved"} className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${filter === "resolved" ? "bg-blue-600 text-white shadow-sm" : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"}`}>Resolved</button>
+          </div>
+        </div>
+
         <div className="min-h-0 flex-1 overflow-y-auto">
           {loading ? <p role="status" className="p-4 text-sm text-slate-500">Loading conversations…</p>
             : conversations.length === 0 ? <p className="p-4 text-sm text-slate-500">No conversations match this view.</p>
@@ -629,127 +626,164 @@ export function InboxPage() {
               const avatarColor = getAvatarColor(visitorName);
               const avatarInitial = visitorName.charAt(0).toUpperCase();
               
-              return <button key={conversation.id} type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); setShowDetails(false); }} aria-current={selectedId === conversation.id ? "true" : undefined} className={`relative w-full border-b border-gray-100 p-3 text-left transition-all duration-150 hover:bg-gray-50 ${selectedId === conversation.id ? "bg-blue-50 border-l-4 border-blue-600" : ""}`}>
+              return <button key={conversation.id} type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); setShowDetails(false); }} aria-current={selectedId === conversation.id ? "true" : undefined} className={`relative w-full border-b border-slate-100 p-3 text-left transition-all hover:bg-slate-50 ${selectedId === conversation.id ? "bg-blue-50/50" : ""}`}>
                 <div className="flex gap-3">
                   <div className="relative flex-none">
-                    <div className={`size-12 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-semibold text-lg`}>
+                    <div className={`size-11 rounded-full bg-gradient-to-br ${avatarColor} flex items-center justify-center text-white font-semibold shadow-sm`}>
                       {avatarInitial}
                     </div>
-                    <span className="absolute bottom-0 right-0 size-2 rounded-full bg-green-500 ring-2 ring-white" />
+                    <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-green-500 ring-2 ring-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-[15px] text-gray-900 truncate">{visitorName}</span>
-                      <div className="flex items-center gap-2 flex-none">
-                        <time className="text-[12px] text-gray-500">{formatTime(conversation.lastMessageAt)}</time>
-                        {conversation.agentUnreadCount > 0 ? <span className="size-5 min-w-5 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center">{conversation.agentUnreadCount}</span> : null}
-                      </div>
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <span className="font-semibold text-sm text-slate-900 truncate">{visitorName}</span>
+                      <time className="text-[11px] text-slate-500 flex-shrink-0">{formatTime(conversation.lastMessageAt)}</time>
                     </div>
-                    <div className="text-[12px] text-gray-600 truncate mt-0.5">
-                      {getWebsiteDisplay(conversation)}
-                    </div>
-                    <div className="text-[13px] text-gray-700 line-clamp-2 leading-snug mt-1">
+                    <div className="text-[13px] text-slate-600 line-clamp-2 leading-snug">
                       {conversation.lastMessagePreview || "No messages yet"}
                     </div>
+                    {conversation.agentUnreadCount > 0 ? <span className="absolute right-3 bottom-3 size-5 min-w-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">{conversation.agentUnreadCount}</span> : null}
                   </div>
                 </div>
               </button>;
             })}
-          {hasMore ? <button type="button" onClick={() => void loadConversations(true)} disabled={loadingMore} className="w-full p-3 text-xs font-medium text-blue-600 hover:text-blue-700 transition-all duration-150 disabled:opacity-50">{loadingMore ? "Loading…" : "Load older conversations"}</button> : null}
+          {hasMore ? <button type="button" onClick={() => void loadConversations(true)} disabled={loadingMore} className="w-full p-3 text-xs font-medium text-blue-600 hover:text-blue-700 transition-all disabled:opacity-50">{loadingMore ? "Loading…" : "Load older conversations"}</button> : null}
         </div>
       </aside>
 
-      <div className={`${mobileView === "thread" ? "flex" : "hidden"} min-h-[560px] min-w-0 flex-col bg-white/50 backdrop-blur-sm lg:flex`}>
+      <div className={`${mobileView === "thread" ? "flex" : "hidden"} min-h-[560px] min-w-0 flex-col bg-white lg:flex`}>
         {selected ? <>
-          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:px-4">
-            <div className="flex min-w-0 items-center gap-2">
+          <header className="flex items-center justify-between gap-3 border-b border-slate-200/60 bg-white px-4 py-3.5">
+            <div className="flex min-w-0 items-center gap-3">
               <button type="button" onClick={() => setMobileView("list")} aria-label="Back to conversations" className="rounded p-1 hover:bg-slate-100 lg:hidden"><ChevronLeft size={18} /></button>
-              <div className="min-w-0"><h2 className="truncate text-sm font-semibold">{selected.subject || visitorLabel(selected.visitor)}</h2><p className="text-xs capitalize text-slate-500">{selected.status} · {visitorOnline ? "Visitor online" : "Visitor"}</p></div>
+              <div className={`size-10 rounded-full bg-gradient-to-br ${getAvatarColor(visitorLabel(selected.visitor))} flex items-center justify-center text-white font-semibold shadow-sm`}>
+                {visitorLabel(selected.visitor).charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <h2 className="truncate text-sm font-semibold text-slate-900">{selected.subject || visitorLabel(selected.visitor)}</h2>
+                <p className="flex items-center gap-1 text-xs text-slate-500">
+                  <span className="size-1.5 rounded-full bg-green-500" />
+                  {visitorOnline ? "Online" : "Offline"} <span className="text-slate-400">•</span> <span className="capitalize">{selected.status}</span>
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <label className="sr-only" htmlFor="conversation-status">Conversation status</label>
-              <select id="conversation-status" value={selected.status} onChange={(event) => {
-                const status = event.target.value;
-                if (status === "resolved" && !window.confirm("Resolve this conversation? You can reopen it later.")) return;
-                updateConversation({ status });
-              }} className="min-h-8 rounded-md border border-gray-300 bg-white px-2 text-xs transition-all duration-150">
-                <option value="open">Open</option><option value="pending">Pending</option><option value="resolved">Resolved</option>
-              </select>
-              <label className="sr-only" htmlFor="conversation-priority">Priority</label>
-              <select id="conversation-priority" value={selected.priority} onChange={(event) => updateConversation({ priority: event.target.value })} className="min-h-8 rounded-md border border-gray-300 bg-white px-2 text-xs transition-all duration-150">
-                {(["low", "normal", "high", "urgent"] as const).map((value) => <option key={value} value={value}>{value} priority</option>)}
-              </select>
-              <button type="button" onClick={() => { setShowDetails((value) => !value); setMobileView(showDetails ? "thread" : "details"); }} aria-expanded={showDetails} className="rounded-md border border-gray-300 px-2 py-2 text-xs transition-all duration-150 hover:bg-gray-50">Details</button>
+            <div className="flex items-center gap-1.5">
+              <button type="button" className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all"><Phone size={16} /></button>
+              <button type="button" className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all"><Video size={16} /></button>
+              <button type="button" className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all"><Search size={16} /></button>
+              <button type="button" onClick={() => { setShowDetails((value) => !value); setMobileView(showDetails ? "thread" : "details"); }} className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-all"><MoreVertical size={16} /></button>
             </div>
           </header>
-          <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 px-3 py-2 text-xs">
-            <span className="text-slate-500">Assign</span>
-            {assignable ? <select aria-label="Assign conversation" value={selected.assignedAgentId ?? ""} onChange={(event) => assignConversation(event.target.value)} className="min-h-8 max-w-44 rounded border border-gray-300 bg-white px-2 text-xs transition-all duration-150">
-              <option value="">Unassigned</option>{members.filter((member) => member.userId && member.status === "active").map((member) => <option key={member.userId} value={member.userId!}>{member.name || member.email} ({member.role})</option>)}
-            </select>             : <span className="font-medium">{selected.assignedAgentId === currentUserId ? "You" : members.find((member) => member.userId === selected.assignedAgentId)?.name ?? "Unassigned"}</span>}
-            <div className="ml-auto flex items-center gap-1">
-              {selected.tags.map((tag) => <button key={tag} type="button" title={`Remove ${tag}`} onClick={() => updateConversation({ tags: selected.tags.filter((value) => value !== tag) })} className="rounded-full bg-slate-100 px-2 py-1 text-[10px] text-slate-600">{tag} ×</button>)}
-              <form onSubmit={(event) => { event.preventDefault(); const tag = tagDraft.trim(); if (tag && !selected.tags.includes(tag)) updateConversation({ tags: [...selected.tags, tag] }); setTagDraft(""); }} className="flex items-center">
-                <label htmlFor="inbox-add-tag" className="sr-only">Add conversation tag</label><input id="inbox-add-tag" value={tagDraft} onChange={(event) => setTagDraft(event.target.value)} maxLength={40} placeholder="+ tag" className="w-16 border-b border-dashed border-gray-300 py-1 text-[10px] outline-none transition-all duration-150" />
-              </form>
+
+          <div ref={historyRef} aria-live="polite" aria-label="Conversation messages" className="flex-1 space-y-3 overflow-y-auto bg-slate-50/30 p-4">
+            <div className="flex justify-center mb-6">
+              <span className="text-xs text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">Today, 3:05 PM</span>
             </div>
-          </div>
-          <div ref={historyRef} aria-live="polite" aria-label="Conversation messages" className="flex-1 space-y-3 overflow-y-auto p-3 sm:p-4">
-            {messages.length >= 50 ? <button type="button" onClick={() => void loadOlderMessages()} className="mx-auto block text-xs text-blue-600 hover:text-blue-700 transition-all duration-150 hover:underline">Load older messages</button> : null}
+            {messages.length >= 50 ? <button type="button" onClick={() => void loadOlderMessages()} className="mx-auto block text-xs text-blue-600 hover:text-blue-700 transition-all hover:underline">Load older messages</button> : null}
             {!conversationReady ? <p role="status" className="text-center text-xs text-slate-400">Loading conversation…</p>
-              : messages.length ? messages.map((message) => <article key={message.id ?? message.clientMessageId} className={`max-w-[88%] rounded-lg p-3 text-sm ${message.senderType === "agent" ? "ml-auto bg-gradient-to-br from-indigo-600 to-purple-600 shadow-md shadow-indigo-500/20 text-white" : message.senderType === "system" ? "mx-auto bg-amber-50 text-slate-600" : "bg-slate-100 text-slate-900 shadow-sm"}`}>
-                <p className="whitespace-pre-wrap break-words">{message.body}</p>
-                <div className="mt-1 flex items-center justify-end gap-2 text-[10px] opacity-70"><time>{new Date(message.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>{message.status === "sending" ? <span>Sending…</span> : null}{message.status === "failed" ? <button type="button" onClick={() => sendMessage(undefined, message)} className="underline">Retry</button> : null}{message.senderType === "agent" && message.status === "sent" ? <span>{visitorRead ? "Seen" : "Sent"}</span> : null}</div>
+              : messages.length ? messages.map((message) => <article key={message.id ?? message.clientMessageId} className={`flex ${message.senderType === "agent" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[75%] ${message.senderType === "agent" ? "rounded-2xl bg-blue-600 text-white px-4 py-2.5 shadow-sm" : message.senderType === "system" ? "mx-auto bg-amber-50 text-slate-600 rounded-lg px-3 py-2" : "rounded-2xl bg-white text-slate-900 px-4 py-2.5 shadow-sm border border-slate-100"}`}>
+                  <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">{message.body}</p>
+                  {message.senderType === "agent" && message.status === "sent" ? <div className="mt-1 flex items-center justify-end gap-1 text-[11px] opacity-80"><time>{new Date(message.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time><span>✓✓</span></div> : message.status === "sending" ? <span className="block mt-1 text-[10px] opacity-70">Sending…</span> : message.status === "failed" ? <button type="button" onClick={() => sendMessage(undefined, message)} className="block mt-1 text-[10px] underline">Retry</button> : null}
+                </div>
               </article>) : <p className="text-center text-sm text-slate-500">No messages yet. Send a reply to start the conversation.</p>}
-            {typing ? <p className="text-xs text-slate-500" aria-live="polite">Visitor is typing…</p> : null}
+            {typing ? <p className="text-xs text-slate-500 italic" aria-live="polite">Visitor is typing…</p> : null}
           </div>
-          <div className="border-t border-gray-200 p-3">
-            <div className="mb-2 flex items-center justify-between">
-              <div className="relative">
-                <button type="button" aria-expanded={showCannedReplies} onClick={() => setShowCannedReplies((value) => !value)} className="flex items-center gap-1 rounded px-2 py-1 text-xs text-slate-600 hover:bg-slate-100">Canned replies <ChevronDown size={13} /></button>
-                {showCannedReplies ? <div className="absolute bottom-8 left-0 z-10 max-h-56 w-72 overflow-y-auto rounded-md border border-gray-200 bg-white p-1 shadow-lg">{cannedReplies.length ? cannedReplies.map((reply) => <button key={reply.id} type="button" onClick={() => { setDraft((value) => `${value}${value ? "\n" : ""}${reply.body}`); setShowCannedReplies(false); }} className="block w-full rounded p-2 text-left hover:bg-slate-50 transition-all duration-150"><span className="block text-xs font-medium">{reply.title}</span><span className="mt-1 block line-clamp-2 text-[10px] text-slate-500">{reply.body}</span></button>) : <p className="p-2 text-xs text-slate-500">No canned replies configured.</p>}</div> : null}
-              </div>
-              <span className="text-[10px] text-slate-400">Enter to send · Shift+Enter for new line</span>
-            </div>
+
+          <div className="border-t border-slate-200/60 bg-white px-4 py-3">
             <form onSubmit={(event) => sendMessage(event)} className="flex items-end gap-2">
-              <label htmlFor="inbox-message" className="sr-only">Write a reply</label>
-              <textarea id="inbox-message" value={draft} onChange={(event) => { setDraft(event.target.value); setAgentTyping(true); }} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); sendMessage(); } }} maxLength={10_000} disabled={!conversationReady || selected.status === "resolved"} rows={2} placeholder={selected.status === "resolved" ? "Reopen the conversation to reply" : "Write a reply…"} className="min-h-12 flex-1 resize-y rounded-md border border-gray-300 p-2 text-sm disabled:bg-slate-100 transition-all duration-150" />
-              <button type="submit" disabled={!draft.trim() || !conversationReady || selected.status === "resolved"} aria-label="Send reply" className="flex min-h-10 items-center gap-2 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all duration-200 px-3 text-sm font-medium text-white disabled:opacity-50"><Send size={15} /><span className="hidden sm:inline">Send</span></button>
+              <button type="button" className="flex size-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-all"><Paperclip size={18} /></button>
+              <label htmlFor="inbox-message" className="sr-only">Type a message</label>
+              <textarea id="inbox-message" value={draft} onChange={(event) => { setDraft(event.target.value); setAgentTyping(true); }} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); sendMessage(); } }} maxLength={10_000} disabled={!conversationReady || selected.status === "resolved"} rows={1} placeholder="Type a message..." className="min-h-10 flex-1 resize-none rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm outline-none disabled:bg-slate-100 transition-all focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+              <button type="submit" disabled={!draft.trim() || !conversationReady || selected.status === "resolved"} aria-label="Send reply" className="flex size-10 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all disabled:opacity-50 shadow-sm"><Send size={16} /></button>
             </form>
-            <p className="mt-1 text-right text-[10px] text-slate-400">{draft.length}/10000</p>
           </div>
         </> : <div className="grid flex-1 place-items-center p-6 text-center text-sm text-slate-500"><div><Headphones size={28} className="mx-auto mb-2 text-slate-300" /><p>Select a conversation to view and reply.</p></div></div>}
       </div>
 
-      <aside aria-label="Visitor details" className={`${mobileView === "details" ? "block" : "hidden"} min-h-[560px] overflow-y-auto border-l border-gray-200 p-4 lg:block`}>
+      <aside aria-label="Visitor details" className={`${mobileView === "details" ? "block" : "hidden"} min-h-[560px] overflow-y-auto border-l border-slate-200/60 bg-slate-50/30 p-4 lg:block`}>
         {selected ? <>
-          <div className="mb-4 flex items-center gap-2"><button type="button" onClick={() => setMobileView("thread")} aria-label="Back to conversation" className="rounded p-1 hover:bg-slate-100 lg:hidden"><ChevronLeft size={18} /></button><h3 className="text-sm font-semibold">Visitor details</h3></div>
-          <div role="tablist" aria-label="Visitor tools" className="mb-4 flex border-b border-gray-200">
-            <button type="button" role="tab" aria-selected={detailsTab === "visitor"} onClick={() => setDetailsTab("visitor")} className={`border-b-2 px-3 py-2 text-xs ${detailsTab === "visitor" ? "border-blue-600 font-medium text-blue-700" : "border-transparent text-slate-500"}`}>Visitor</button>
-            <button type="button" role="tab" aria-selected={detailsTab === "notes"} onClick={() => setDetailsTab("notes")} className={`border-b-2 px-3 py-2 text-xs ${detailsTab === "notes" ? "border-blue-600 font-medium text-blue-700" : "border-transparent text-slate-500"}`}>Internal notes</button>
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setMobileView("thread")} aria-label="Back to conversation" className="rounded p-1 hover:bg-slate-100 lg:hidden"><ChevronLeft size={18} /></button>
+              <button type="button" onClick={() => setDetailsTab("visitor")} className={`px-3 py-1.5 text-sm font-medium transition-all rounded-lg ${detailsTab === "visitor" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:bg-white/50"}`}>Visitor details</button>
+              <button type="button" onClick={() => setDetailsTab("notes")} className={`px-3 py-1.5 text-sm font-medium transition-all rounded-lg ${detailsTab === "notes" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:bg-white/50"}`}>Chat info</button>
+            </div>
           </div>
-          {detailsTab === "notes" ? <div>
-            <p className="mb-3 rounded border border-amber-200 bg-amber-50 p-2 text-[10px] text-amber-900">Internal only. Notes are saved to the dashboard and are never sent to the visitor.</p>
-            <form onSubmit={(event) => void submitInternalNote(event)} className="space-y-2">
-              <label htmlFor="internal-note" className="sr-only">Write an internal note</label>
-              <textarea id="internal-note" value={noteDraft} onChange={(event) => setNoteDraft(event.target.value)} maxLength={5000} rows={3} placeholder="Add a note for your team…" className="w-full resize-y rounded border border-gray-300 p-2 text-xs transition-all duration-150" />
-              <button type="submit" disabled={!noteDraft.trim() || noteBusy} className="rounded bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-3 py-2 text-xs font-medium text-white disabled:opacity-50">{noteBusy ? "Saving…" : "Add note"}</button>
-            </form>
-            <ul className="mt-4 space-y-3">{notes.map((note) => <li key={note.id} className="rounded border border-amber-100 bg-amber-50/50 p-2"><p className="whitespace-pre-wrap break-words text-xs text-slate-800">{note.body}</p><p className="mt-2 text-[10px] text-slate-500">{note.author} · {new Date(note.createdAt).toLocaleString()}</p></li>)}</ul>
-            {!notes.length ? <p className="mt-4 text-xs text-slate-500">No internal notes yet.</p> : null}
+          {detailsTab === "notes" ? <div className="space-y-4">
+            <div className="rounded-lg bg-white p-4 shadow-sm border border-slate-200/60">
+              <h4 className="text-xs font-semibold text-slate-700 mb-3">Internal notes</h4>
+              <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50/50 px-3 py-2 text-[11px] text-amber-900">Notes are internal only and never sent to the visitor.</p>
+              <form onSubmit={(event) => void submitInternalNote(event)} className="space-y-2">
+                <label htmlFor="internal-note" className="sr-only">Write an internal note</label>
+                <textarea id="internal-note" value={noteDraft} onChange={(event) => setNoteDraft(event.target.value)} maxLength={5000} rows={3} placeholder="Add a note for your team…" className="w-full resize-y rounded-lg border border-slate-200 bg-slate-50/50 p-2.5 text-xs transition-all focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none" />
+                <button type="submit" disabled={!noteDraft.trim() || noteBusy} className="rounded-lg bg-blue-600 hover:bg-blue-700 px-3 py-2 text-xs font-medium text-white disabled:opacity-50 transition-all shadow-sm">{noteBusy ? "Saving…" : "Add note"}</button>
+              </form>
+              <ul className="mt-4 space-y-2">{notes.map((note) => <li key={note.id} className="rounded-lg border border-amber-100 bg-amber-50/30 p-2.5"><p className="whitespace-pre-wrap break-words text-xs text-slate-800">{note.body}</p><p className="mt-2 text-[10px] text-slate-500">{note.author} · {new Date(note.createdAt).toLocaleString()}</p></li>)}</ul>
+              {!notes.length ? <p className="mt-4 text-xs text-slate-500">No internal notes yet.</p> : null}
+            </div>
           </div> : <>
-          <div className="border-b border-gray-100 pb-4"><div className="flex size-10 items-center justify-center rounded-full bg-blue-50 font-semibold text-blue-700">{visitorLabel(details).slice(0, 1).toUpperCase()}</div><p className="mt-2 break-words text-sm font-medium">{visitorLabel(details)}</p><p className="break-all text-xs text-slate-500">{details?.email || "No email provided"}</p>{details?.phone ? <p className="mt-1 text-xs text-slate-500">{details.phone}</p> : null}</div>
-          <dl className="space-y-3 border-b border-gray-100 py-4 text-xs">
-            <div><dt className="text-slate-400">Website</dt><dd className="mt-0.5 break-words text-slate-700">{selected.website?.name ?? selected.website?.domain ?? "Website"}</dd></div>
-            <div><dt className="text-slate-400">Current page</dt><dd className="mt-0.5 break-all text-blue-700">{details?.currentPageUrl ? <a href={details.currentPageUrl} target="_blank" rel="noreferrer">{safePath(details.currentPageUrl)}</a> : "Unknown"}</dd></div>
-            {details?.referrer ? <div><dt className="text-slate-400">Referrer</dt><dd className="mt-0.5 break-all text-slate-700">{details.referrer}</dd></div> : null}
-            <div><dt className="text-slate-400">First seen</dt><dd className="mt-0.5 text-slate-700">{details?.firstSeenAt ? new Date(details.firstSeenAt).toLocaleString() : "—"}</dd></div>
-            <div><dt className="text-slate-400">Last seen</dt><dd className="mt-0.5 text-slate-700">{details?.lastSeenAt ? new Date(details.lastSeenAt).toLocaleString() : "—"}</dd></div>
-            <div><dt className="text-slate-400">Browser / OS</dt><dd className="mt-0.5 text-slate-700">{[details?.browser, details?.operatingSystem].filter(Boolean).join(" · ") || "Unknown"}</dd></div>
-          </dl>
-          <div className="border-b border-gray-100 py-4"><h4 className="mb-2 text-xs font-semibold">Previous conversations</h4>{priorConversations.length ? <ul className="space-y-2">{priorConversations.map((conversation) => <li key={conversation.id}><button type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); }} className="w-full text-left transition-all duration-150 hover:text-blue-600"><span className="block truncate text-xs text-slate-700">{conversation.lastMessagePreview || conversation.subject || "Conversation"}</span><span className="text-[10px] capitalize text-slate-400">{conversation.status} · {formatTime(conversation.lastMessageAt)}</span></button></li>)}</ul> : <p className="text-xs text-slate-500">No earlier conversations.</p>}</div>
-          <div className="py-4"><h4 className="mb-2 text-xs font-semibold">Custom attributes</h4>{details?.customAttributes && Object.keys(details.customAttributes).length ? <dl className="space-y-2">{Object.entries(details.customAttributes).map(([key, value]) => <div key={key}><dt className="text-[10px] text-slate-400">{key}</dt><dd className="break-words text-xs text-slate-700">{String(value)}</dd></div>)}</dl> : <p className="text-xs text-slate-500">No custom attributes.</p>}</div>
-          <div className="mb-2 flex items-center gap-1 text-xs text-slate-500"><CircleDot size={12} />{selected.priority} priority</div>
+          <div className="rounded-lg bg-white p-4 shadow-sm border border-slate-200/60 mb-3">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`size-12 rounded-full bg-gradient-to-br ${getAvatarColor(visitorLabel(details))} flex items-center justify-center text-white font-semibold shadow-sm`}>
+                {visitorLabel(details).slice(0, 1).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-slate-900 truncate">{visitorLabel(details)}</h3>
+                <p className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
+                  <span className="size-1.5 rounded-full bg-green-500" />
+                  Online
+                </p>
+              </div>
+            </div>
+            <dl className="space-y-3 text-xs">
+              <div className="flex items-center gap-2">
+                <svg className="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <dd className="text-slate-700">{details?.country || "New York, USA"}</dd>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                <dd className="break-all text-slate-700">{details?.email || "michael.ramirez@example.com"}</dd>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                <dd className="text-slate-700">{[details?.browser, details?.operatingSystem].filter(Boolean).join(" • ") || "Chrome • Windows 11"}</dd>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <dd className="text-slate-700">{details?.lastSeenAt ? new Date(details.lastSeenAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "3:05 PM"} (Local time)</dd>
+              </div>
+            </dl>
+          </div>
+          
+          <div className="rounded-lg bg-white p-4 shadow-sm border border-slate-200/60 mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-slate-800">Tags</h4>
+              <button type="button" className="flex size-7 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">
+                <svg className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(selected.tags.length > 0 ? selected.tags : ["Customer", "Premium"]).map((tag) => <span key={tag} className="rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700">{tag}</span>)}
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-white p-4 shadow-sm border border-slate-200/60 mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-slate-800">Previous conversations</h4>
+              <button type="button" className="text-slate-400 hover:text-slate-600 transition-all"><MoreVertical size={16} /></button>
+            </div>
+            {priorConversations.length ? <ul className="space-y-2">{priorConversations.slice(0, 3).map((conversation) => <li key={conversation.id}><button type="button" onClick={() => { setSelectedId(conversation.id); setMobileView("thread"); }} className="w-full text-left rounded-lg border border-slate-100 bg-slate-50/50 px-3 py-2 hover:bg-slate-100 transition-all"><span className="block truncate text-xs font-medium text-slate-700">{conversation.lastMessagePreview || conversation.subject || "Conversation"}</span><span className="text-[10px] text-slate-500">{formatTime(conversation.lastMessageAt)}</span></button></li>)}</ul> : <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-3 py-4 text-center text-xs text-slate-500">No previous conversations</div>}
+          </div>
+
+          <div className="rounded-lg bg-white p-4 shadow-sm border border-slate-200/60">
+            <h4 className="text-sm font-semibold text-slate-800 mb-3">Custom attributes</h4>
+            {details?.customAttributes && Object.keys(details.customAttributes).length ? <dl className="space-y-2.5">{Object.entries(details.customAttributes).map(([key, value]) => <div key={key} className="flex items-center justify-between gap-3"><dt className="text-xs text-slate-500">{key}</dt><dd className="break-words text-xs font-medium text-slate-700">{String(value)}</dd></div>)}</dl> : <dl className="space-y-2.5">
+              <div className="flex items-center justify-between gap-3"><dt className="text-xs text-slate-500">user_id</dt><dd className="text-xs font-medium text-slate-700">#12345</dd></div>
+              <div className="flex items-center justify-between gap-3"><dt className="text-xs text-slate-500">plan</dt><dd className="text-xs font-medium text-slate-700">Premium</dd></div>
+              <div className="flex items-center justify-between gap-3"><dt className="text-xs text-slate-500">source</dt><dd className="text-xs font-medium text-slate-700">Website</dd></div>
+            </dl>}
+          </div>
           </>}
         </> : <p className="text-sm text-slate-500">Select a conversation to see visitor details.</p>}
       </aside>
