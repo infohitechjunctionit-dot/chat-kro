@@ -6,7 +6,7 @@ import {
   requireAuthentication
 } from "../middleware/authenticate.js";
 import { requireCsrfToken } from "../middleware/csrf.js";
-import { InternalNote, Website, Visitor } from "../models/index.js";
+import { Conversation, InternalNote, Message, Website, Visitor } from "../models/index.js";
 import { Notification } from "../models/index.js";
 import { listMembers, setMemberStatus, updateMemberRole } from "../services/member-service.js";
 import { listConversations, updateConversation } from "../services/conversation-service.js";
@@ -339,6 +339,16 @@ workspacesRouter.patch("/:workspaceId/conversations/:conversationId", requireCsr
       priority: conversation.priority
     }
   });
+});
+
+workspacesRouter.delete("/:workspaceId/conversations/:conversationId", requireCsrfToken, async (request, response) => {
+  const actor = actorFromRequest(request);
+  const workspaceId = routeParam(request, "workspaceId");
+  const conversationId = routeParam(request, "conversationId");
+  const scope = await requireConversation(actor, workspaceId, conversationId);
+  await Message.deleteMany({ conversationId: scope.conversation._id });
+  await Conversation.findByIdAndDelete(scope.conversation._id);
+  response.status(204).end();
 });
 
 workspacesRouter.get("/:workspaceId/conversations/:conversationId/messages", async (request, response) => {

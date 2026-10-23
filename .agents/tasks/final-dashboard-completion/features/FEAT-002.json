@@ -1,0 +1,38 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Create History page to display all past conversations with filtering (All/Open/Resolved), pagination, and delete functionality. Includes API endpoint to delete conversations and their messages. This gives users a clean way to manage conversation history.",
+  "status": "completed",
+  "steps": [
+    "1. Create apps/dashboard/src/app/(dashboard)/dashboard/history/page.tsx with a client component that fetches conversations from /workspaces/:workspaceId/conversations?limit=20&status=<filter>",
+    "2. Implement filter tabs: All, Open, Resolved - clicking a tab updates the status query param and refetches",
+    "3. Display conversations in a table with columns: Visitor (avatar with gradient background using getAvatarColor pattern + display name), Website (website.name or domain), Full URL (visitor.currentPageUrl, fallback to website domain), Date (lastMessageAt formatted), Messages (show message count if available, or fetch), Status (badge with color: green for resolved, blue for open, yellow for pending), Actions (Delete button icon)",
+    "4. Delete button opens a confirmation dialog (use native confirm() for simplicity), then optimistically removes from UI and calls DELETE /workspaces/:workspaceId/conversations/:conversationId endpoint",
+    "5. Add pagination controls at bottom: Previous/Next buttons, show 20 per page, use cursor-based pagination with lastMessageAt",
+    "6. Add empty state: 'No conversation history yet' when the list is empty",
+    "7. Add DELETE /workspaces/:workspaceId/conversations/:conversationId route handler in apps/api/src/routes/workspaces.ts: require authentication + CSRF token, use requireWorkspaceMember and requireConversation for authorization, delete all messages with Message.deleteMany({ conversationId }), delete conversation with Conversation.findByIdAndDelete(conversationId), return 204 No Content",
+    "8. Handle delete errors gracefully - if API call fails, re-add the conversation to UI and show error message"
+  ],
+  "acceptance_criteria": [
+    "History page accessible at /dashboard/history",
+    "Page shows list of conversations with all required columns",
+    "Filter tabs work - All shows all conversations, Open shows status=open, Resolved shows status=resolved",
+    "Delete button prompts for confirmation before deleting",
+    "DELETE API endpoint successfully removes conversation and all its messages from MongoDB",
+    "Pagination works - shows 20 items per page with Previous/Next navigation",
+    "Empty state displays when no conversations exist",
+    "Full URL from visitor.currentPageUrl displays correctly in the table"
+  ],
+  "verification": [
+    "Run npm run dev from workspace root",
+    "Navigate to http://localhost:3000/dashboard/history",
+    "Verify conversation list displays with all columns",
+    "Click filter tabs (All, Open, Resolved) and verify filtering works",
+    "Click Delete on a conversation, confirm the dialog, verify it disappears from UI",
+    "Check MongoDB directly to confirm conversation and messages are deleted",
+    "Test pagination if more than 20 conversations exist",
+    "Test empty state by deleting all conversations"
+  ],
+  "blocked_reason": null,
+  "findings": "Successfully implemented the History page at /dashboard/history with full conversation listing, filtering (All/Open/Resolved), and delete functionality. Created a responsive table view showing visitor information with avatar, website name, full URL from visitor.currentPageUrl, formatted date, status badge, and delete button. Implemented DELETE API endpoint at /workspaces/:workspaceId/conversations/:conversationId that removes both the conversation and all associated messages from MongoDB using requireConversation for authorization. Added optimistic UI updates with error recovery, pagination (20 items per page with cursor-based 'Load More'), and empty state messaging. Build completed successfully with no TypeScript errors."
+}
