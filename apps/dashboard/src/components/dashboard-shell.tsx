@@ -4,7 +4,7 @@ import Link from "next/link";
 import { io } from "socket.io-client";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Bell, Building2, Clock, DoorOpen, Globe2, LoaderCircle,
+  Bell, Building2, Clock, DoorOpen, LoaderCircle,
   Menu, MessagesSquare, Settings
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -12,7 +12,6 @@ import { ApiError, apiRequest, clearCsrfToken, type AuthMeResponse, type Workspa
 
 const navigation = [
   { label: "Inbox", href: "/dashboard/inbox", icon: MessagesSquare, roles: null },
-  { label: "Widgets", href: "/dashboard/websites", icon: Globe2, roles: null },
   { label: "History", href: "/dashboard/history", icon: Clock, roles: null },
   { label: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["owner", "admin"] }
 ] as const;
@@ -227,6 +226,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <Link 
+              href="/dashboard/websites/new"
+              className="hidden sm:flex items-center gap-2 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <span className="text-lg leading-none">+</span>
+              Create Widget
+            </Link>
             <label htmlFor="mobile-workspace-select" className="sr-only">Select workspace</label>
             <select id="mobile-workspace-select" value={workspaceId} onChange={(event) => setWorkspaceId(event.target.value)} className="max-w-36 rounded-md border border-slate-200 bg-white px-2 py-2 text-xs md:max-w-48 lg:hidden">
               {(auth?.workspaces ?? []).map((item) => item.workspace ? <option key={item.workspace.id} value={item.workspace.id}>{item.workspace.name}</option> : null)}
