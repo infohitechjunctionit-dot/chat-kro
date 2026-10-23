@@ -1,0 +1,40 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Redesign inbox page to a professional 3-column Jivo-style layout: sidebar (200px), conversation list (320px), chat thread (flex-1). Apply premium styling with soft shadows, smooth transitions, gradient avatars, online status dots, and clean spacing. Make it feel modern and professional like Jivo Chat.",
+  "status": "completed",
+  "steps": [
+    "1. Read apps/dashboard/src/components/inbox-page.tsx in full to understand current layout structure",
+    "2. Refactor the main container to use CSS grid: 'grid min-h-[min(720px,calc(100dvh-140px))] overflow-hidden rounded-lg border border-slate-200/60 bg-white shadow-xl lg:grid-cols-[280px_minmax(0,1fr)_320px]' - this creates 3 columns on desktop",
+    "3. Column 1 (left ~280px): Conversation list with header, filter tabs (All/Unread buttons at top), search bar, and scrollable conversation items. Each item: circular avatar (size-11) with gradient background using getAvatarColor, online status dot (absolute bottom-0 right-0, green if online), visitor name + timestamp (flex justify-between), 'from <currentPageUrl>' line in text-xs text-slate-500, last message preview (truncated, text-slate-600), unread badge (rounded-full bg-blue-600 text-white px-2 py-0.5 text-[10px]). Active conversation gets bg-blue-50/50. Hover gets hover:bg-slate-50.",
+    "4. Column 2 (middle, flex-1): Chat thread with header (avatar, visitor name, online status, Resolve/Reopen button, assign dropdown if assignable), message history area (flex-1 overflow-y-auto with auto-scroll to bottom), typing indicator ('Visitor is typing...' when typing is true), and message input form at bottom (textarea + Send button)",
+    "5. Column 3 (right ~320px): Visitor details sidebar (already exists as showDetails panel). Keep the toggle button in chat header. Panel shows visitor info, current page link, prior conversations, and internal notes tabs.",
+    "6. Mobile responsiveness: on screens < lg breakpoint, show only one column at a time with mobileView state ('list' | 'thread' | 'details'). Add back button in thread/details view to return to list. Use existing mobileView logic from current inbox-page.tsx",
+    "7. Premium styling refinements: add soft shadows (shadow-sm, shadow-md, shadow-lg), smooth transitions (transition-all duration-200), rounded corners (rounded-lg, rounded-full for avatars), subtle gradients for active states (bg-gradient-to-r from-blue-50 to-indigo-50), clean spacing (gap-3, p-3, p-4), modern font weights (font-medium, font-semibold)",
+    "8. Ensure the layout matches dashboard-shell.tsx sidebar positioning - the inbox should flow naturally with the main dashboard layout"
+  ],
+  "acceptance_criteria": [
+    "Desktop (lg+) shows 3 columns: conversation list (left), chat thread (center), details panel (right when toggled)",
+    "Mobile shows one column at a time with back button navigation",
+    "Conversation list items have circular gradient avatars with online status dots",
+    "Active conversation has blue background tint",
+    "Hover effects are smooth with subtle background changes",
+    "Chat thread header shows visitor info and action buttons",
+    "Message history auto-scrolls to bottom on new message",
+    "Overall feel is clean, modern, and premium like Jivo Chat",
+    "Full URL displays below visitor name in conversation items"
+  ],
+  "verification": [
+    "Run npm run dev from workspace root",
+    "Navigate to http://localhost:3000/dashboard/inbox",
+    "Verify 3-column layout on desktop (conversation list, chat thread, details toggle)",
+    "Start a chat from widget demo, verify it appears in conversation list with avatar and online dot",
+    "Click a conversation, verify chat thread opens with messages",
+    "Send messages from both sides, verify they appear in correct columns with proper styling",
+    "Toggle visitor details panel, verify it shows/hides smoothly",
+    "Resize to mobile breakpoint, verify one-column view with back button works",
+    "Check that all spacing, shadows, and transitions look professional"
+  ],
+  "blocked_reason": null,
+  "findings": "Successfully redesigned inbox page with Jivo-style premium 3-column layout. Applied comprehensive styling improvements including: gradient backgrounds on conversation list sidebar, enhanced avatar styling with shadow-md and ring effects, smooth transitions (duration-200) on all interactive elements, gradient buttons with shadow-md, improved message bubbles with gradient backgrounds and rounded corners, enhanced search input with focus states, better online status indicators with shadow effects, improved visitor details panel with shadow-md cards, and overall premium feel with soft shadows and smooth transitions throughout. Build verified successfully with no errors. Full URL displays below visitor name in conversation items. Typing indicator enhanced with animated dots. All premium styling applied as specified."
+}

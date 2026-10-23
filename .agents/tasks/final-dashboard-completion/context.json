@@ -1,0 +1,27 @@
+{
+  "project_type": "Next.js 16 App Router dashboard + Express API + MongoDB + Socket.IO real-time chat",
+  "language": "TypeScript",
+  "build_system": "npm workspaces with Next.js build and tsc for API compilation",
+  "test_framework": "vitest for API unit tests; dashboard tested manually in browser",
+  "build_command": "npm run build (from workspace root)",
+  "test_command": "npm run test (from workspace root, runs vitest in API package)",
+  "verification_instructions": "1. Run npm run dev from workspace root (starts API on :4000 and dashboard on :3000). 2. Navigate to http://localhost:3000/dashboard/inbox. 3. Open widget demo in another tab/window. 4. Test real-time chat, verify instant message delivery, typing indicators, online status. 5. Check history page for conversation list and delete functionality. 6. Verify sidebar has only 5 items. 7. Confirm full URL display in conversation list and details.",
+  "snapshot_or_generated_files": "None - all changes are source code",
+  "environment_constraints": "Local development with hot reload. Socket.IO already configured and running. MongoDB must be running locally. No Redis required for dev (rate limits disabled). Widget dev mode enabled in API .env (WIDGET_DEV_MODE=true).",
+  "contribution_requirements": "Maintain existing authentication and CSRF patterns. Follow Next.js 16 App Router conventions (client components use 'use client' directive). Use existing socket.io event patterns from apps/api/src/socket/realtime.ts. Match existing Tailwind styling patterns from dashboard-shell.tsx and inbox-page.tsx.",
+  "key_patterns": "Dashboard shell (apps/dashboard/src/components/dashboard-shell.tsx) provides sidebar nav and wraps all dashboard pages. Inbox uses client component (inbox-page.tsx) with socket.io-client connection. API routes in apps/api/src/routes/workspaces.ts use requireAuthentication and requireCsrfToken middleware. Models in apps/api/src/models/ use Mongoose with baseSchemaOptions. Socket events emit via emitToConversation helper function. Visitor model has currentPageUrl field (2048 chars, HTTP URL validated). Real-time handlers already in place for conversation:message, conversation:typing, visitor:presence, unread:update.",
+  "relevant_files": [
+    "apps/dashboard/src/components/dashboard-shell.tsx",
+    "apps/dashboard/src/components/inbox-page.tsx",
+    "apps/dashboard/src/components/dashboard-pages.tsx",
+    "apps/dashboard/src/app/(dashboard)/dashboard/page.tsx",
+    "apps/api/src/routes/workspaces.ts",
+    "apps/api/src/models/conversation.ts",
+    "apps/api/src/models/visitor.ts",
+    "apps/api/src/socket/realtime.ts",
+    "apps/api/src/services/conversation-service.ts",
+    "apps/api/src/services/widget-service.ts",
+    "apps/widget/src/main.ts"
+  ],
+  "directory_structure": "apps/dashboard/src/ - Next.js app with app/(dashboard)/dashboard/ route structure and components/ folder. apps/api/src/ - Express API with routes/, models/, services/, socket/ folders. apps/widget/ - standalone widget built with Vite. packages/shared/ - shared TypeScript types and Zod schemas."
+}

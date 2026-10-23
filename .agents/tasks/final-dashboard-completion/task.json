@@ -1,0 +1,7 @@
+{
+  "task_id": "task-final-dashboard-completion",
+  "task_description": "Complete chat dashboard with simplified sidebar, history page, full URL display, Jivo-style 3-column inbox, and real-time features (instant messages, notifications, typing indicators)",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004", "FEAT-005"],
+  "blocked_reason": null
+}

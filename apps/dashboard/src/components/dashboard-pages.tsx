@@ -474,14 +474,21 @@ function WebsiteCreatePage() {
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
     const input = String(form.get("domain") ?? "").trim();
-    let origin: string;
-    try {
-      const url = new URL(input.includes("://") ? input : `https://${input}`);
-      if (!["http:", "https:"].includes(url.protocol)) throw new Error();
-      origin = url.origin;
-    } catch {
-      setError("Enter a valid website domain.");
-      return;
+    
+    // If no domain provided, use placeholder
+    let domain = "widget.example.com";
+    let origin = "https://widget.example.com";
+    
+    if (input) {
+      try {
+        const url = new URL(input.includes("://") ? input : `https://${input}`);
+        if (!["http:", "https:"].includes(url.protocol)) throw new Error();
+        origin = url.origin;
+        domain = url.host;
+      } catch {
+        setError("Enter a valid website domain or leave empty to configure later.");
+        return;
+      }
     }
 
     
@@ -490,7 +497,7 @@ function WebsiteCreatePage() {
     try {
       const result = await apiRequest<{ website: Website }>(`/workspaces/${workspaceId}/websites`, {
         method: "POST",
-        body: JSON.stringify({ name, domain: new URL(origin).host, allowedOrigins: [origin] })
+        body: JSON.stringify({ name, domain, allowedOrigins: [origin] })
       });
       setCreated(result.website);
     } catch (cause) {
@@ -500,13 +507,13 @@ function WebsiteCreatePage() {
     }
   }
   return <section className="max-w-xl">
-    <h1 className="text-xl font-semibold">Add a website</h1>
-    <p className="mt-1 text-sm text-slate-600">Allowed origin is set to the exact website origin.</p>
+    <h1 className="text-xl font-semibold">Create a widget</h1>
+    <p className="mt-1 text-sm text-slate-600">Enter a widget name. Domain can be configured later in settings.</p>
     {error ? <div className="mt-4"><PageState message={error} error /></div> : null}
-    {created ? <div className="mt-5 rounded-lg border border-slate-200 bg-white p-5"><h2 className="font-semibold">Website created</h2><p className="mt-2 text-sm">{created.name} · {created.domain}</p><label className="mt-4 block text-xs font-medium text-slate-600">Public widget ID<input readOnly value={created.publicWidgetId} className="mt-1 w-full rounded-md border border-slate-300 bg-slate-50 p-2 font-mono text-xs" /></label><label className="mt-4 block text-xs font-medium text-slate-600">Installation snippet<textarea readOnly rows={8} value={widgetInstallSnippet(created.publicWidgetId)} className="mt-1 w-full resize-none rounded-md border border-slate-300 bg-slate-50 p-2 font-mono" /></label><button onClick={() => router.push(`/dashboard/websites/${created.id}`)} className="mt-4 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2 text-sm font-medium text-white">View website settings</button></div> : <form onSubmit={(event) => void submit(event)} className="mt-5 space-y-4 rounded-lg border border-slate-200 bg-white p-5">
-      <label className="block text-sm font-medium">Website name<input name="name" required maxLength={120} className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm" /></label>
-      <label className="block text-sm font-medium">Domain<input name="domain" required maxLength={253} placeholder="example.com" className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm" /></label>
-      <button disabled={busy || !workspaceId} className="rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">{busy ? "Adding…" : "Add website"}</button>
+    {created ? <div className="mt-5 rounded-lg border border-slate-200 bg-white p-5"><h2 className="font-semibold">Widget created</h2><p className="mt-2 text-sm">{created.name} · {created.domain}</p><label className="mt-4 block text-xs font-medium text-slate-600">Public widget ID<input readOnly value={created.publicWidgetId} className="mt-1 w-full rounded-md border border-slate-300 bg-slate-50 p-2 font-mono text-xs" /></label><label className="mt-4 block text-xs font-medium text-slate-600">Installation snippet<textarea readOnly rows={8} value={widgetInstallSnippet(created.publicWidgetId)} className="mt-1 w-full resize-none rounded-md border border-slate-300 bg-slate-50 p-2 font-mono" /></label><button onClick={() => router.push(`/dashboard/websites/${created.id}`)} className="mt-4 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2 text-sm font-medium text-white">View widget settings</button></div> : <form onSubmit={(event) => void submit(event)} className="mt-5 space-y-4 rounded-lg border border-slate-200 bg-white p-5">
+      <label className="block text-sm font-medium">Widget name<input name="name" required maxLength={120} placeholder="My website chat" className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm" /></label>
+      <label className="block text-sm font-medium">Domain (optional)<input name="domain" maxLength={253} placeholder="example.com (leave empty to configure later)" className="mt-1 min-h-10 w-full rounded-md border border-slate-300 px-3 text-sm" /><span className="mt-1 block text-xs text-slate-500">You can configure the domain and allowed origins later in widget settings.</span></label>
+      <button disabled={busy || !workspaceId} className="rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">{busy ? "Creating…" : "Create widget"}</button>
     </form>}
   </section>;
 }

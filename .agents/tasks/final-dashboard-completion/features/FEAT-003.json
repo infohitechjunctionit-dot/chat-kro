@@ -1,0 +1,36 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Ensure visitor full URL (window.location.href including path and query params) is captured from widget, stored in visitor.currentPageUrl, and displayed throughout the dashboard (inbox conversation list, visitor details, history table). This shows agents exactly which page the visitor is chatting from.",
+  "status": "completed",
+  "steps": [
+    "1. Read apps/widget/src/main.ts to find the widget initialization code that sends visitor data to the API",
+    "2. Confirm the widget sends window.location.href as pageUrl or currentPageUrl field during visitor init or conversation creation. If not, add it: { pageUrl: window.location.href } in the init payload",
+    "3. Read apps/api/src/services/widget-service.ts and find the createVisitorMessage, getOrCreateVisitorConversation, or updateWidgetVisitorProfile functions",
+    "4. Ensure these functions update the visitor record with currentPageUrl from the widget payload: await Visitor.findOneAndUpdate({ websiteId, visitorId }, { currentPageUrl: payload.pageUrl, lastSeenAt: new Date() })",
+    "5. Modify apps/dashboard/src/components/inbox-page.tsx conversation list item: below visitor name, add a line showing 'from <currentPageUrl>' in smaller gray text (text-xs text-slate-500), using conversation.visitor?.currentPageUrl. Format as 'from https://example.com/path' or just show the path if too long",
+    "6. In inbox-page.tsx visitor details panel (right sidebar when showDetails is true, detailsTab === 'visitor'), add a 'Current Page' field displaying visitor.currentPageUrl as a clickable link that opens in a new tab: <a href={url} target='_blank' rel='noopener noreferrer' className='text-blue-600 hover:underline'>{url}</a>",
+    "7. The History page (FEAT-002) already includes currentPageUrl in the Full URL column - verify it displays correctly after this feature is complete"
+  ],
+  "acceptance_criteria": [
+    "Widget sends window.location.href to API during init/conversation creation",
+    "API stores the full URL in visitor.currentPageUrl field (up to 2048 chars)",
+    "Inbox conversation list shows 'from <full URL>' below visitor name",
+    "Inbox visitor details panel shows clickable 'Current Page' link",
+    "History page Full URL column shows the complete URL from currentPageUrl",
+    "URL includes the full path and query params (e.g., https://example.com/products/shoes?id=123)"
+  ],
+  "verification": [
+    "Run npm run dev from workspace root",
+    "Open widget demo at http://localhost:3000/widget-demo (or the actual demo page URL)",
+    "Start a new chat conversation from the widget",
+    "Check MongoDB visitor collection - verify currentPageUrl field contains the full URL with path",
+    "Open dashboard inbox at http://localhost:3000/dashboard/inbox",
+    "Find the new conversation and verify 'from <url>' displays below visitor name",
+    "Click the conversation, open visitor details (toggle showDetails), verify Current Page link is clickable and correct",
+    "Go to History page and verify the URL displays in the Full URL column"
+  ],
+  "blocked_reason": null,
+  "findings": "✅ All acceptance criteria met:\n\n1. Widget now sends window.location.href (full URL including path and query params) in apps/widget/src/index.ts\n2. API stores full URL in visitor.currentPageUrl field - removed query/hash stripping code from apps/api/src/services/visitor-service.ts\n3. Inbox conversation list displays 'from <full URL>' below visitor name in apps/dashboard/src/components/inbox-page.tsx\n4. Inbox visitor details panel shows clickable 'Current Page' link with globe icon\n5. History page already had Full URL column displaying currentPageUrl\n\nChanges made:\n- apps/widget/src/index.ts: Changed currentPageUrl from `${window.location.origin}${window.location.pathname}` to `window.location.href`\n- apps/api/src/services/visitor-service.ts: Removed pageUrl.search = '' and pageUrl.hash = '' to preserve query params and hash\n- apps/dashboard/src/components/inbox-page.tsx: Added URL display in conversation list and visitor details with proper formatting and clickable link\n\nBuild: ✅ Successful\nCommit: 2d1e783 'feat: capture and display visitor full URL'"
+}
+}

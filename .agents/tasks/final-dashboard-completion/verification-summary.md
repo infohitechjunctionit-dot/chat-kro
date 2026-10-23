@@ -138,20 +138,44 @@
   - Can rotate widget IDs
 - **Note:** Quick questions feature would need to be added separately (currently canned replies exist at workspace level, not per-widget)
 
-#### 2. **OTP Verification Flow** 🟡
-- **Issue:** Need to verify that signup sends OTP (not verification link) and verifies the OTP
-- **Status:** Code exists but needs runtime verification
-- **Files to check:**
-  - `apps/api/src/routes/auth.ts`
-  - Email sending logic
-- **Impact:** Medium - Authentication flow may not match requirements
+#### 2. **OTP Verification Flow** 🔴
+- **Issue:** Current implementation uses email verification **links/tokens** instead of OTP codes
+- **Expected:** 
+  - Signup sends 6-digit OTP code to email
+  - User enters OTP code in a form field to verify
+  - Direct login after OTP verification
+- **Current:** 
+  - Signup sends email with verification link
+  - User clicks link to verify
+  - Must login separately after verification
+- **Files:** 
+  - `apps/api/src/routes/auth.ts` (lines 108-123: sends verification URL)
+  - `apps/api/src/models/identity.ts` (has `emailVerificationOtp` and `otpExpiry` fields but not used)
+- **Impact:** High - Authentication flow doesn't match user requirements
+- **Fix Required:** 
+  - Modify signup endpoint to generate 6-digit OTP and send via email (no link)
+  - Create/modify verify endpoint to accept OTP code
+  - Auto-login after successful OTP verification
 
-#### 3. **Widget Link Format** 🟡
+#### 3. **Widget Creation Requires Domain** ✅ FIXED
+- **Issue:** Widget creation form required both name AND domain
+- **Expected:** Create widget with **name only** (no URL/domain required initially)
+- **Fix Applied:** 
+  - Made domain field optional in the form
+  - Uses placeholder domain "widget.example.com" if not provided
+  - User can configure actual domain later in widget settings
+  - Form title changed from "Add a website" to "Create a widget"
+  - Help text explains domain is optional
+- **Files:** `apps/dashboard/src/components/dashboard-pages.tsx` (WebsiteCreatePage)
+
+#### 4. **Widget Link Format** ✅ VERIFIED
 - **Issue:** User requested widget link format: `https://chat-kro-dashboard.onrender.com/widget-demo?widgetId=<ID>`
-- **Status:** Need to verify this is the actual format used
-- **Expected:** Widget demo page should accept `widgetId` query parameter
-- **Current:** Widget demo page exists at `/widget-demo`
-- **Impact:** Medium - Demo/preview links may not work as expected
+- **Status:** ✅ Implemented correctly
+- **Verification:** 
+  - Widget demo page at `/widget-demo` accepts `widgetId` query parameter
+  - Code in `apps/dashboard/src/components/widget-demo.tsx` reads `search.get("widgetId")`
+  - Link format in WebsiteSettingsEditor: `/widget-demo?widgetId=${encodeURIComponent(widgetId)}`
+- **Impact:** None - Working as expected
 
 ---
 
