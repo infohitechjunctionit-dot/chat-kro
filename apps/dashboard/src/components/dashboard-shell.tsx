@@ -13,7 +13,7 @@ import { ApiError, apiRequest, clearCsrfToken, type AuthMeResponse, type Workspa
 const navigation = [
   { label: "Inbox", href: "/dashboard/inbox", icon: MessagesSquare, roles: null },
   { label: "History", href: "/dashboard/history", icon: Clock, roles: null },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["owner", "admin"] }
+  { label: "Settings", href: "/dashboard/websites", icon: Settings, roles: null }
 ] as const;
 
 type NotificationItem = { id: string; type: string; createdAt: string };
