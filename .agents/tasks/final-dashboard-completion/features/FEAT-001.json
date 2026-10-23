@@ -1,0 +1,34 @@
+{
+  "id": "FEAT-001",
+  "type": "refactor",
+  "description": "Simplify sidebar navigation to 5 essential items: Inbox (with unread badge), Widgets, History, Settings, and Logout. Remove Contacts, Team, Canned replies, Analytics, Billing, Profile, and Agent login. This creates a clean, focused navigation matching the user's request for a simplified dashboard.",
+  "status": "completed",
+  "steps": [
+    "1. Read apps/dashboard/src/components/dashboard-shell.tsx and locate the navigation array (currently has 9+ items)",
+    "2. Reduce the navigation array to only 5 items: Inbox (/dashboard/inbox, MessagesSquare icon), Widgets (/dashboard/websites, Globe2 icon - rename label from 'Websites / Widgets' to 'Widgets'), History (/dashboard/history, Clock icon - new route), Settings (/dashboard/settings, Settings icon, roles: owner/admin), Logout (converted from button to nav item, DoorOpen icon)",
+    "3. Add unread count badge to Inbox nav item by reading conversation unread counts from the socket connection state or fetching from API on mount, displaying a small red badge with the count when > 0",
+    "4. Remove the Agent login link from the footer section",
+    "5. Remove the Logout button from footer and replace with the nav item",
+    "6. Test responsiveness - mobile navigation tabs should also show only these 5 items",
+    "7. Ensure role-based visibility still works for Settings (owner/admin only)"
+  ],
+  "acceptance_criteria": [
+    "Sidebar shows exactly 5 navigation items: Inbox, Widgets, History, Settings, Logout",
+    "Inbox item displays unread badge when agentUnreadCount > 0 across conversations",
+    "Settings item only visible to owner/admin roles",
+    "Mobile navigation shows the same 5 items in horizontal tabs",
+    "Clicking each nav item navigates to the correct route",
+    "Logout item triggers the logout function and redirects to login"
+  ],
+  "verification": [
+    "Run npm run dev from workspace root",
+    "Navigate to http://localhost:3000/dashboard/inbox",
+    "Confirm sidebar shows exactly 5 items (Inbox, Widgets, History, Settings, Logout)",
+    "Start a chat from widget demo, send unread message, verify Inbox badge updates",
+    "Click each nav item to verify routing works",
+    "Click Logout and confirm redirect to /login",
+    "Resize to mobile breakpoint and verify mobile nav shows same 5 items"
+  ],
+  "blocked_reason": null,
+  "findings": "Successfully simplified sidebar navigation from 9 items to 5 essential items (Inbox, Widgets, History, Settings, Logout). Removed Contacts, Team, Canned replies, Analytics, Billing, Profile, and Agent login link. Added unread message badge to Inbox item that dynamically updates via socket.io events. Logout moved from footer button to navigation item. Changes applied to both desktop sidebar and mobile navigation tabs. Role-based visibility maintained for Settings (owner/admin only). Build completed successfully with no errors."
+}

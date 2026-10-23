@@ -4,22 +4,17 @@ import Link from "next/link";
 import { io } from "socket.io-client";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Activity, Bell, Building2, CreditCard, DoorOpen, Globe2, LoaderCircle,
-  Menu, MessagesSquare, Settings, Users, UserRound, UsersRound, Zap
+  Bell, Building2, Clock, DoorOpen, Globe2, LoaderCircle,
+  Menu, MessagesSquare, Settings
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ApiError, apiRequest, clearCsrfToken, type AuthMeResponse, type WorkspaceItem } from "@/lib/api";
 
 const navigation = [
   { label: "Inbox", href: "/dashboard/inbox", icon: MessagesSquare, roles: null },
-  { label: "Contacts", href: "/dashboard/contacts", icon: Users, roles: null },
-  { label: "Websites / Widgets", href: "/dashboard/websites", icon: Globe2, roles: null },
-  { label: "Team", href: "/dashboard/team", icon: UsersRound, roles: ["owner", "admin", "supervisor"] },
-  { label: "Canned replies", href: "/dashboard/canned-replies", icon: Zap, roles: null },
-  { label: "Analytics", href: "/dashboard/analytics", icon: Activity, roles: null },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["owner", "admin"] },
-  { label: "Billing", href: "/dashboard/billing", icon: CreditCard, roles: ["owner", "admin"] },
-  { label: "Profile", href: "/dashboard/profile", icon: UserRound, roles: null }
+  { label: "Widgets", href: "/dashboard/websites", icon: Globe2, roles: null },
+  { label: "History", href: "/dashboard/history", icon: Clock, roles: null },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings, roles: ["owner", "admin"] }
 ] as const;
 
 type NotificationItem = { id: string; type: string; createdAt: string };
@@ -35,6 +30,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState("");
   const [loggingOut, setLoggingOut] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [totalUnreadCount, setTotalUnreadCount] = useState(0);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("sidebar-collapsed");
@@ -80,6 +76,15 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           if (!ack.ok) setError(ack.error?.message ?? "Unable to join the inbox.");
         }
       );
+      // Fetch initial unread count
+      void apiRequest<{ conversations: Array<{ agentUnreadCount: number }> }>(
+        `/workspaces/${workspaceId}/conversations?limit=100`
+      ).then((result) => {
+        const total = result.conversations.reduce((sum, conv) => sum + conv.agentUnreadCount, 0);
+        setTotalUnreadCount(total);
+      }).catch(() => {
+        // Silently fail - unread badge is non-critical
+      });
     });
     socket.on("disconnect", () => setConnectionStatus("Reconnecting…"));
     socket.on("connect_error", () => setConnectionStatus("Offline"));
@@ -88,6 +93,28 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         { id: notification.id, type: notification.type, createdAt: new Date().toISOString() },
         ...current.filter((item) => item.id !== notification.id)
       ].slice(0, 25));
+    });
+    // Listen for unread count updates
+    socket.on("unread:update", (data: { conversationId: string; agentUnreadCount: number }) => {
+      void apiRequest<{ conversations: Array<{ agentUnreadCount: number }> }>(
+        `/workspaces/${workspaceId}/conversations?limit=100`
+      ).then((result) => {
+        const total = result.conversations.reduce((sum, conv) => sum + conv.agentUnreadCount, 0);
+        setTotalUnreadCount(total);
+      }).catch(() => {
+        // Silently fail
+      });
+    });
+    socket.on("conversation:message", () => {
+      // Refetch unread count when new messages arrive
+      void apiRequest<{ conversations: Array<{ agentUnreadCount: number }> }>(
+        `/workspaces/${workspaceId}/conversations?limit=100`
+      ).then((result) => {
+        const total = result.conversations.reduce((sum, conv) => sum + conv.agentUnreadCount, 0);
+        setTotalUnreadCount(total);
+      }).catch(() => {
+        // Silently fail
+      });
     });
     return () => {
       socket.disconnect();
@@ -167,22 +194,22 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <nav aria-label="Dashboard" className="flex-1 space-y-1 overflow-y-auto p-3">
           {visibleNavigation.map(({ label, href, icon: Icon }) => {
             const active = pathname === href || (href !== "/dashboard/inbox" && pathname.startsWith(`${href}/`));
+            const isInbox = href === "/dashboard/inbox";
             return <Link key={href} href={href} className={`flex min-h-10 items-center gap-3 rounded-md px-3 text-sm transition-all duration-200 ${active ? "bg-gradient-to-r from-indigo-50 to-purple-50 font-semibold text-indigo-700 shadow-sm border-l-4 border-indigo-600" : "text-slate-600 hover:bg-slate-100/80 hover:translate-x-1"} ${sidebarCollapsed ? "justify-center" : ""}`}>
               <Icon size={17} className="shrink-0" />
               <span className={`transition-opacity duration-300 overflow-hidden ${sidebarCollapsed ? "opacity-0 hidden" : "opacity-100"}`}>{label}</span>
+              {isInbox && totalUnreadCount > 0 && (
+                <span className="ml-auto flex items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white min-w-[20px] shadow-sm">
+                  {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
+                </span>
+              )}
             </Link>;
           })}
-        </nav>
-        <div className="border-t border-slate-200 p-3">
-          <Link href="/loginlive" className={`mb-2 flex min-h-9 items-center gap-2 rounded-md px-3 text-xs font-medium text-slate-600 hover:bg-slate-100 ${sidebarCollapsed ? "justify-center" : ""}`}>
-            <DoorOpen size={15} className="shrink-0" />
-            <span className={`transition-opacity duration-300 overflow-hidden ${sidebarCollapsed ? "opacity-0 hidden" : "opacity-100"}`}>Agent login</span>
-          </Link>
-          <button onClick={() => void logout()} disabled={loggingOut} className={`flex min-h-10 w-full items-center gap-2 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-100 disabled:opacity-60 ${sidebarCollapsed ? "justify-center" : ""}`}>
-            <DoorOpen size={16} className="shrink-0" />
-            <span className={`transition-opacity duration-300 overflow-hidden ${sidebarCollapsed ? "opacity-0 hidden" : "opacity-100"}`}>{loggingOut ? "Signing out…" : "Sign out"}</span>
+          <button onClick={() => void logout()} disabled={loggingOut} className={`flex min-h-10 w-full items-center gap-3 rounded-md px-3 text-sm text-slate-600 hover:bg-slate-100/80 hover:translate-x-1 disabled:opacity-60 transition-all duration-200 ${sidebarCollapsed ? "justify-center" : ""}`}>
+            <DoorOpen size={17} className="shrink-0" />
+            <span className={`transition-opacity duration-300 overflow-hidden ${sidebarCollapsed ? "opacity-0 hidden" : "opacity-100"}`}>{loggingOut ? "Signing out…" : "Logout"}</span>
           </button>
-        </div>
+        </nav>
       </aside>
       <div className={`min-h-screen transition-all duration-300 ease-in-out ${sidebarCollapsed ? "lg:pl-15" : "lg:pl-60"}`}>
         <header className="sticky top-0 z-10 flex min-h-16 items-center justify-between gap-4 border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-md px-4 sm:px-6">
@@ -219,6 +246,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           {visibleNavigation.map(({ label, href }) => (
             <Link key={href} href={href} className={`whitespace-nowrap rounded-md px-3 py-2 text-xs ${pathname === href ? "bg-blue-50 font-medium text-blue-700" : "text-slate-600 hover:bg-slate-100"}`}>{label}</Link>
           ))}
+          <button onClick={() => void logout()} disabled={loggingOut} className="whitespace-nowrap rounded-md px-3 py-2 text-xs text-slate-600 hover:bg-slate-100 disabled:opacity-60">
+            {loggingOut ? "Signing out…" : "Logout"}
+          </button>
         </nav>
         <main className="mx-auto max-w-[1600px] p-4 sm:p-6">
           {error ? <p role="alert" className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
