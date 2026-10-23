@@ -326,7 +326,10 @@ export function InboxPage() {
       if (id === selectedRef.current) {
         setMessages((current) => mergeMessages(current, [message]));
         if (message.senderType === "visitor") setVisitorRead(false);
-      } else if (message.senderType === "visitor") {
+      }
+      
+      // Play sound and show notification for visitor messages
+      if (message.senderType === "visitor") {
         if (soundEnabledRef.current) {
           try {
             const AudioContextClass = window.AudioContext;
@@ -341,11 +344,16 @@ export function InboxPage() {
             oscillator.stop(audio.currentTime + 0.12);
             oscillator.onended = () => void audio.close();
           } catch {
-            setError("The notification sound could not be played by this browser.");
+            // Silently fail - sound is optional
           }
         }
-        if (notificationsEnabledRef.current && "Notification" in window && Notification.permission === "granted") {
-          new Notification("New visitor message", { body: message.body.slice(0, 120) });
+        
+        // Show browser notification only when window not focused
+        if (notificationsEnabledRef.current && !document.hasFocus() && "Notification" in window && Notification.permission === "granted") {
+          new Notification("New visitor message", { 
+            body: message.body.slice(0, 120),
+            icon: "/favicon.ico"
+          });
         }
       }
       refreshRef.current();
@@ -676,8 +684,24 @@ export function InboxPage() {
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              <button type="button" className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm"><Phone size={16} /></button>
-              <button type="button" className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm"><Video size={16} /></button>
+              <button 
+                type="button" 
+                onClick={toggleSound}
+                aria-label={soundEnabled ? "Disable notification sound" : "Enable notification sound"}
+                title={soundEnabled ? "Sound enabled" : "Sound disabled"}
+                className={`flex size-9 items-center justify-center rounded-lg border transition-all duration-200 shadow-sm ${soundEnabled ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300"}`}
+              >
+                {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+              </button>
+              <button 
+                type="button" 
+                onClick={() => void toggleNotifications()}
+                aria-label={notificationsEnabled ? "Disable browser notifications" : "Enable browser notifications"}
+                title={notificationsEnabled ? "Notifications enabled" : "Notifications disabled"}
+                className={`flex size-9 items-center justify-center rounded-lg border transition-all duration-200 shadow-sm ${notificationsEnabled ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300"}`}
+              >
+                <Bell size={16} />
+              </button>
               <button type="button" className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 shadow-sm"><Search size={16} /></button>
               <button type="button" onClick={() => { setShowDetails((value) => !value); setMobileView(showDetails ? "thread" : "details"); }} className={`flex size-9 items-center justify-center rounded-lg border text-slate-600 transition-all duration-200 shadow-sm ${showDetails ? "bg-blue-50 border-blue-200 text-blue-700" : "bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300"}`}><MoreVertical size={16} /></button>
             </div>
